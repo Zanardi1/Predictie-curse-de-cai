@@ -1,10 +1,8 @@
 import pandas as pd
 
 raw_data = pd.read_excel('Data.xlsx')
-# print(raw_data.shape)
-# print(raw_data.head())
-# print(raw_data.isnull().any(axis=1))
-
+print(raw_data.shape)
+print(raw_data.head())
 
 # Creez dataframe-ul cu proprietatile cailor
 horse_data = pd.DataFrame()
