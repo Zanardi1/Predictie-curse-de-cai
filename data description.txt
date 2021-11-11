@@ -2,39 +2,39 @@ FEATURES I WOULD LIKE TO TEST OUT/MODEL ON, that could be extracted from the raw
 
 Features:
 - Last FGrating ((we'll need to remove scratches/withdrawal/nonrunners from these kind of queries, that is we're just using those rows that contains a FG-rating) (X)
-- Last final position (i.e did it win, run 2nd, 3rd, etc in its last start) (X)
-- Last FGrating at the track in question (Last FGrating at the same track that they are racing on in the race we're trying to predict) (X)
-- Last final position at the track in question (Last final_position at the same track that they are racing on in the race we're trying to predict) (X)
-- Last FGrating at the distance in question (at the exact distance as for the race we're trying to predict) (X)
+- Last final position (i.e did it win, run 2nd, 3rd, etc in its last start)
+- Last FGrating at the track in question (Last FGrating at the same track that they are racing on in the race we're trying to predict)
+- Last final position at the track in question (Last final_position at the same track that they are racing on in the race we're trying to predict)
+- Last FGrating at the distance in question (at the exact distance as for the race we're trying to predict)
 - Last final position at the distance in question (at the exact distance as for the race we're trying to predict)
-- Last FGrating at the surface in question (Last FG-rating at the surface the race we're trying to predict is running on (They race at two surfaces in horse racing, either a turf-track or a dirt-track)) (X)
-- Last final position at the surface in question (Last final_position at the surface the race we're trying to predict is running on) (X)
+- Last FGrating at the surface in question (Last FG-rating at the surface the race we're trying to predict is running on (They race at two surfaces in horse racing, either a turf-track or a dirt-track))
+- Last final position at the surface in question (Last final_position at the surface the race we're trying to predict is running on)
  --> One could consider adding these together to one or two totals for e.g total_last_fgrating and total_last_final_position - as we want to reduce Multicollinearity. 
 NOTE: In many cases a horse won't have raced at a track previously, or at a particular distance, or surface. Later I will look deeper into a better solution for this, but as of now, we should just try to neutralize missing valid data as much as possible. (make sure it doesn't need to have data registered in every place, for the model to run)
 NOTE2:"In question" just signals that we're trying to predict a particular race, based upon that race's particulat characteristics. That is a particular track, surface, distance, etc. Every horse and trainer would have preferences/categories where they perform better or worse, and that's what's we're trying to use for our predictions. 
 
-- Mean FGrating overall (we'll need to remove scratches/withdrawal/nonrunners from these kind of queries, that is we're just using those rows that contains a FG-rating) (X)
-- Mean final position overall (X)
+- Mean FGrating overall (we'll need to remove scratches/withdrawal/nonrunners from these kind of queries, that is we're just using those rows that contains a FG-rating)
+- Mean final position overall
 - Mean FGrating last 10 starts (as compared to "overall", this would say something about the current general level) (X)
-- Mean final position last 10 starts (X)
-- Mean FGrating last 4 starts (We need a way to give recent performances more weight in the model - this would say something about current form) (X)
-- Mean final position last 4 starts (X)
-- Mean FGrating at the track in question (Here we're looking for course specialists, horses that are particular good at a particular track) (X)
-- Mean final position at the track in question (X)
-- Mean FGrating at the distance in question (think in bins of distances here - sprint, middle distance, long distance - look below) (X)
+- Mean final position last 10 starts
+- Mean FGrating last 4 starts (We need a way to give recent performances more weight in the model - this would say something about current form)
+- Mean final position last 4 starts
+- Mean FGrating at the track in question (Here we're looking for course specialists, horses that are particular good at a particular track)
+- Mean final position at the track in question
+- Mean FGrating at the distance in question (think in bins of distances here - sprint, middle distance, long distance - look below)
 		Distance_Bins: (These bins will be used in multiple instances)
 			*Sprint_distance = everything up to 1350 metres
 			*Middle_distance = 1350-1800 metres
 			*Long_Distance   = 1800 + metres
 - Mean final position at the distance in question (bins)
-- Mean FGrating at the surface in question (turf-track or dirt-track) (X)
-- Mean final position at the surface in question (X)
+- Mean FGrating at the surface in question (turf-track or dirt-track)
+- Mean final position at the surface in question
    --> One could consider adding these together to two totals for e.g total_mean_fgrating and total_mean_final_position - as we want to reduce Multicollinearity (but also weight for recency).  
 
-- Top/Highest FGrating ever (here we're looking for maximum performance potential - the higher the number, the better they ran) (X)
-- Top/Highest FGrating ever at the track in question (at "todays track", if live data) (X)
-- Top/Highest FGrating ever at the distance in question (think bins - sprint, middle distance, long distance - look below) (the distance in question means at "todays track", if we were live with data) (X)
-- Top/Highest FGrating ever at the surface in question (turf or dirt/aw) (X)
+- Top/Highest FGrating ever (here we're looking for maximum performance potential - the higher the number, the better they ran)
+- Top/Highest FGrating ever at the track in question (at "todays track", if live data)
+- Top/Highest FGrating ever at the distance in question (think bins - sprint, middle distance, long distance - look below) (the distance in question means at "todays track", if we were live with data)
+- Top/Highest FGrating ever at the surface in question (turf or dirt/aw)
 - Top/Highest FGrating last 3 starts or something like that. (We need a way to give recent performances more weight in the model)
  --> One could consider adding these together to a total for e.g total_top_fgrating - as we want to reduce Multicollinearity. 
 
