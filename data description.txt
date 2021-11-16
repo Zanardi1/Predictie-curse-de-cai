@@ -38,18 +38,18 @@ NOTE2:"In question" just signals that we're trying to predict a particular race,
 - Top/Highest FGrating last 3 starts or something like that. (We need a way to give recent performances more weight in the model) (X)
  --> One could consider adding these together to a total for e.g total_top_fgrating - as we want to reduce Multicollinearity. 
 
-- True/False last race was a big new "top". A new top means a race that is 4 points or better than the previous best race ever for a particular horse, i.e a career best race by 4 points or more (a FGrating of say 130, when the previous best rating for this horse was a 125). 
+- True/False last race was a big new "top". A new top means a race that is 4 points or better than the previous best race ever for a particular horse, i.e a career best race by 4 points or more (a FGrating of say 130, when the previous best rating for this horse was a 125). (X)
 
-- Days Since Last Race: How many days it has been since the horse has last raced. A horse that had been injured in its last race may have not raced recently.
+- Days Since Last Race: How many days it has been since the horse has last raced. A horse that had been injured in its last race may have not raced recently. (X)
 
 
 - We need a way to model for trainer statistics, as these are very predictive
 	These are important statistics and a good place to begin:
-		*Trainer win percent last 1000 days (total wins / total starts)
-		*Trainer win percent last 90 days 
-		*Trainer win percent last 30 days
-		*Trainer win percent last 1000 days per distance (distance bins: it's described in the mean fg rating section)
-		*Trainer win percent last 1000 days on this race's surface 
+		*Trainer win percent last 1000 days (total wins / total starts) (X)
+		*Trainer win percent last 90 days (X)
+		*Trainer win percent last 30 days (X)
+		*Trainer win percent last 1000 days per distance (distance bins: it's described in the mean fg rating section) (X)
+		*Trainer win percent last 1000 days on this race's surface (X)
 		*Trainer ROI last 100 days 
 		*Trainer ROI last 1000 days on this race's distance (bins)
 		*Trainer ROI last 1000 days on this race's surface 
@@ -64,12 +64,12 @@ NOTE2:"In question" just signals that we're trying to predict a particular race,
 	
 - We also need a way to model for jockey statistics:
 	The most important statistics for Jockeys:***
-		*Jockey win percent last 1000 days 
-		*Jockey win percent last 1000 days on this track
-		*Jockey win percent last 1000 days on this surface
-		*Jockey win percent last 1000 days on this track AND surface
-		*Jockey win percent last 1000 days on this distance (bins)
-		*Jockey win percent last 1000 days on this surface AND distance (distance bins)
+		*Jockey win percent last 1000 days (X)
+		*Jockey win percent last 1000 days on this track (X)
+		*Jockey win percent last 1000 days on this surface (X)
+		*Jockey win percent last 1000 days on this track AND surface (X)
+		*Jockey win percent last 1000 days on this distance (bins) (X)
+		*Jockey win percent last 1000 days on this surface AND distance (distance bins) (X)
 		*Jockey mean final position last 1000 days 
 		*Jockey mean final position last 1000 days on this track
 		*Jockey mean final position last 1000 days on this surface

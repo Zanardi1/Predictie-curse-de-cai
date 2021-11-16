@@ -4,7 +4,7 @@ raw_data = pd.read_excel('Data.xlsx')
 print(raw_data.shape)
 print(raw_data.head())
 
-featured_data = raw_data
+featured_data = raw_data.copy()
 
 # Calculez Last FGrating total
 featured_data['Last FGrating'] = featured_data.groupby('HorseId')['FGrating'].apply(lambda x: x.shift(1))
@@ -270,7 +270,7 @@ featured_data['Average Position at 2400 m'] = featured_data.loc[
     lambda x: x.shift().expanding().mean())
 
 # Calculez FGrating maxim pentru fiecare cal
-featured_data['Maximum FGrating '] = featured_data.groupby('HorseId')['FGrating'].apply(
+featured_data['Maximum FGrating'] = featured_data.groupby('HorseId')['FGrating'].apply(
     lambda x: x.shift().expanding().max())
 
 # Calculez FGrating maxim pentru Sha-Tin - iarba
@@ -336,6 +336,508 @@ featured_data['Maximum FGrating at 2400 m'] = \
 # Calculez FGrating maxim pentru fiecare cal din ultimele trei starturi
 featured_data['Maximum FGrating in last 3 starts'] = featured_data.groupby('HorseId')['FGrating'].apply(
     lambda x: x.shift().expanding(min_periods=3).max())
+
+# Calculez daca o anumita cursa a fost varf de forma
+featured_data['Top'] = ((featured_data['FGrating'] - featured_data['Maximum FGrating'] >= 4).map({True: 1, False: 0}))
+
+# Calculez numarul de zile de la ultima cursa
+featured_data['Days since last race'] = featured_data.groupby('HorseId')['Dato'].diff()
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.reset_index().groupby('TrainerID').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 90 de zile
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.reset_index().groupby('TrainerID').rolling('90D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 90 days'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 30 de zile
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.reset_index().groupby('TrainerID').rolling('30D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 30 days'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile la distanta de 1000 de metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Distance == 1000].reset_index().groupby('TrainerID').rolling('1000D',
+                                                                                                  on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days on 1000 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distanta de 1200 de metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Distance == 1200].reset_index().groupby('TrainerID').rolling('1000D',
+                                                                                                  on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days on 1200 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distanta de 1400 de metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Distance == 1400].reset_index().groupby('TrainerID').rolling('1000D',
+                                                                                                  on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days on 1400 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distanta de 1600 de metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Distance == 1600].reset_index().groupby('TrainerID').rolling('1000D',
+                                                                                                  on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days on 1600 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distanta de 1650 de metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Distance == 1650].reset_index().groupby('TrainerID').rolling('1000D',
+                                                                                                  on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days on 1650 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distanta de 1800 de metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Distance == 1800].reset_index().groupby('TrainerID').rolling('1000D',
+                                                                                                  on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days on 1800 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distanta de 2000 de metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Distance == 2000].reset_index().groupby('TrainerID').rolling('1000D',
+                                                                                                  on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days on 2000 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distanta de 2200 de metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Distance == 2200].reset_index().groupby('TrainerID').rolling('1000D',
+                                                                                                  on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days on 2200 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distanta de 2400 de metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Distance == 2400].reset_index().groupby('TrainerID').rolling('1000D',
+                                                                                                  on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days on 2400 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile la Sha-Tin - iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'TrainerID').rolling('1000D', on='Dato').agg({'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index(
+    'index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days at Sha Tin Grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile la Sha-Tin - pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'TrainerID').rolling('1000D', on='Dato').agg({'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index(
+    'index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days at Sha Tin Dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile la Happy Valley - iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[
+         (featured_data.Track == 'Happy Valley') & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'TrainerID').rolling('1000D', on='Dato').agg({'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index(
+    'index').mul(100).round(2))
+featured_data['Trainer winning % in the last 1000 days at Sha Tin Grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe Sha Tin
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Track == 'Sha Tin'].reset_index().groupby('JockeyId').rolling('1000D',
+                                                                                                   on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at Sha Tin'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe Happy Valley
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Track == 'Happy Valley'].reset_index().groupby('JockeyId').rolling('1000D',
+                                                                                                        on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at Happy Valley'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Surface == 'Gress'].reset_index().groupby('JockeyId').rolling('1000D',
+                                                                                                   on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days on grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[featured_data.Surface == 'Dirt'].reset_index().groupby('JockeyId').rolling('1000D',
+                                                                                                  on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days on dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe Sha Tin - iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at Sha Tin Grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe Sha Tin - pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at Sha Tin Dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe Happy Valley - iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[
+         (featured_data.Track == 'Happy Valley') & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at Happy Valley Grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1000 metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (
+    featured_data.loc[featured_data.Distance == 1000].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1000 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1200 metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (
+    featured_data.loc[featured_data.Distance == 1200].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1200 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1400 metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (
+    featured_data.loc[featured_data.Distance == 1400].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1400 days at 1000 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1600 metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (
+    featured_data.loc[featured_data.Distance == 1600].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1600 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1650 metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (
+    featured_data.loc[featured_data.Distance == 1650].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1650 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1800 metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (
+    featured_data.loc[featured_data.Distance == 1800].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1800 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 2000 metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (
+    featured_data.loc[featured_data.Distance == 2000].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 2000 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 2200 metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (
+    featured_data.loc[featured_data.Distance == 2200].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 2200 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 2400 metri
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (
+    featured_data.loc[featured_data.Distance == 2400].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 2400 m'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1000 metri, pe iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1000) & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1000 m on grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1000 metri, pe pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1000) & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1000 m on dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1200 metri, pe iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1200) & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1200 m on grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1200 metri, pe pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1200) & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1200 m on dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1400 metri, pe iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1400) & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1400 m on grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1400 metri, pe pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1400) & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1400 m on dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1600 metri, pe iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1600) & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1600 m on grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1600 metri, pe pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1600) & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1600 m on dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1650 metri, pe iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1650) & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1650 m on grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1650 metri, pe pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1650) & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1650 m on dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1800 metri, pe iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1800) & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1800 m on grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 1800 metri, pe pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 1800) & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 1800 m on dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 2000 metri, pe iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 2000) & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 2000 m on grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 2000 metri, pe pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 2000) & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 2000 m on dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 2200 metri, pe iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 2200) & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 2200 m on grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 2200 metri, pe pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 2200) & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 2200 m on dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s  # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 2400 metri, pe iarba
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 2400) & (featured_data.Surface == 'Gress')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 2400 m on grass'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
+
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distanta de 2400 metri, pe pamant
+featured_data['Win'] = featured_data['Plassering'].eq(1)
+s = (featured_data.loc[(featured_data.Distance == 2400) & (featured_data.Surface == 'Dirt')].reset_index().groupby(
+    'JockeyId').rolling('1000D', on='Dato').agg(
+    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+featured_data['Jockey winning % in the last 1000 days at 2400 m on dirt'] = s
+featured_data = featured_data.drop(columns='Win')
+s = pd.DataFrame()
+del s
 
 featured_data.to_excel('Date sortate.xlsx')
 featured_data = pd.DataFrame()
