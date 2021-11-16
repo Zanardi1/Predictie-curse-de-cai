@@ -70,16 +70,16 @@ NOTE2:"In question" just signals that we're trying to predict a particular race,
 		*Jockey win percent last 1000 days on this track AND surface (X)
 		*Jockey win percent last 1000 days on this distance (bins) (X)
 		*Jockey win percent last 1000 days on this surface AND distance (distance bins) (X)
-		*Jockey mean final position last 1000 days 
-		*Jockey mean final position last 1000 days on this track
-		*Jockey mean final position last 1000 days on this surface
-		*Jockey mean final position last 1000 days on this track AND surface
-		*Jockey mean final position last 1000 days on this distance (bins)
-		*Jockey mean final position last 1000 days on this surface AND distance (distance bins)
-		*Jockey Mean Path last 1000 days in general
-		*Jockey Mean Path last 1000 days on this surface
-		*Jockey Mean Path last 1000 days on this track AND surface
-		*Jockey Mean Path last 1000 days on this distance (bins) AND surface
+		*Jockey mean final position last 1000 days (X)
+		*Jockey mean final position last 1000 days on this track (X)
+		*Jockey mean final position last 1000 days on this surface (X)
+		*Jockey mean final position last 1000 days on this track AND surface (X)
+		*Jockey mean final position last 1000 days on this distance (bins) (X)
+		*Jockey mean final position last 1000 days on this surface AND distance (distance bins) (X)
+		*Jockey Mean Path last 1000 days in general (X)
+		*Jockey Mean Path last 1000 days on this surface (X)
+		*Jockey Mean Path last 1000 days on this track AND surface (X)
+		*Jockey Mean Path last 1000 days on this distance (bins) AND surface (X)
 	--> One could consider adding these together to a couple of totals for e.g total_jockey_win-perc, total_jockey_final_pos and jockey_mean_path - as we want to reduce Multicollinearity. 
 
 - There is also an extremely powerful predictor when combining trainer and jockey-statistics, to combo!	
@@ -87,7 +87,7 @@ NOTE2:"In question" just signals that we're trying to predict a particular race,
 
 - True/False if the horse has switched from carrying high weight (i.e 60 kg and higher) to low weight (i.e 54 kg and lower) from last time to this race - and the other way around - from low weight to high weight.  
 
-- Horse win percentage (number of wins / number of starts for each horse)
+- Horse win percentage (number of wins / number of starts for each horse) (X)
 
 - True/False Horse has won a race in its last five races
 
