@@ -152,6 +152,35 @@ def return_mask_and_text_from_surfaces(data, surface_name, metric):
     return mask, text
 
 
+def return_mask_and_text_from_distances_and_surfaces(data, distance, surface_type, metric):
+    if distance == 0:  # Distante scurte
+        if surface_type == 0:  # Pe iarba
+            mask = ((data.Distance == 1000) | (data.Distance == 1200)) & (data.Surface == 'Gress')
+            text = str(metric) + ' at sprint distances on grass'
+        if surface_type == 1:  # Pe pamant
+            mask = ((data.Distance == 1000) | (data.Distance == 1200)) & (data.Surface == 'Dirt')
+            text = str(metric) + ' at sprint distances on dirt'
+    if distance == 1:  # Distante medii
+        if surface_type == 0:  # Pe iarba
+            mask = ((data.Distance == 1400) | (data.Distance == 1600) | (data.Distance == 1650) | (
+                    data.Distance == 1800)) & (data.Surface == 'Gress')
+            text = str(metric) + ' at middle distances on grass'
+        if surface_type == 1:  # Pe pamant
+            mask = ((data.Distance == 1400) | (data.Distance == 1600) | (data.Distance == 1650) | (
+                    data.Distance == 1800)) & (data.Surface == 'Dirt')
+            text = str(metric) + ' at middle distances on dirt'
+    if distance == 2:  # Distante lungi
+        if surface_type == 0:  # Pe iarba
+            mask = ((data.Distance == 2000) | (data.Distance == 2200) | (data.Distance == 2400)) & (
+                    data.Surface == 'Gress')
+            text = str(metric) + ' at long distance on grass'
+        if surface_type == 1:  # Pe pamant
+            mask = ((data.Distance == 2000) | (data.Distance == 2200) | (data.Distance == 2400)) & (
+                    data.Surface == 'Dirt')
+            text = str(metric) + ' at long distance on dirt'
+    return mask, text
+
+
 # Calculez Last FGrating total
 featured_data['Last FGrating'] = compute_last_fgrating(featured_data)
 
@@ -248,12 +277,12 @@ for i in [1000, 90, 30]:
 
 # Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile, pe cele trei distante
 for i in range(3):
-    mask, text = return_mask_and_text_from_distances(featured_data, i, 'Trainer winning % in the last 1000 days ')
+    mask, text = return_mask_and_text_from_distances(featured_data, i, 'Trainer winning % in the last 1000 days')
     featured_data[text] = compute_trainer_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez procentajul de victorii ale unui antrenor, in ultimele 1000 de zile, pe cele trei piste
 for i in range(3):
-    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Trainer winning % in the last 1000 days ')
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Trainer winning % in the last 1000 days')
     featured_data[text] = compute_trainer_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile
@@ -263,64 +292,29 @@ featured_data['Jockey winning % in the last 1000 days'] = compute_jockey_win_per
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe cele trei piste, precum si pe piste,
 # dar indiferent de suprafata
 for i in range(5):
-    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Jockey winning % in the last 1000 days ')
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare suprafata
 for i in [0, 1]:
-    mask, text = return_mask_and_text_from_surfaces(featured_data, i, 'Jockey winning % in the last 1000 days ')
+    mask, text = return_mask_and_text_from_surfaces(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare pista
 for i in range(3):
-    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Jockey winning % in the last 1000 days ')
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare distanta
 for i in range(3):
-    mask, text = return_mask_and_text_from_distances(featured_data, i, 'Jockey winning % in the last 1000 days ')
+    mask, text = return_mask_and_text_from_distances(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distante scurte, pe iarba
-mask = ((featured_data.Distance == 1000) | (featured_data.Distance == 1200)) & (
-        featured_data.Surface == 'Gress')
-featured_data[
-    'Jockey winning % in the last 1000 days at sprint distances on grass'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distante scurte, pe pamant
-mask = ((featured_data.Distance == 1000) | (featured_data.Distance == 1200)) & (
-        featured_data.Surface == 'Dirt')
-featured_data['Jockey winning % in the last 1000 days at 1000 m on dirt'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distante medii, pe iarba
-mask = ((featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (featured_data.Distance == 1650) | (
-        featured_data.Distance == 1800)) & (featured_data.Surface == 'Gress')
-featured_data[
-    'Jockey winning % in the last 1000 days at middle distances on grass'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distante medii, pe pamant
-mask = ((featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (featured_data.Distance == 1650) | (
-        featured_data.Distance == 1800)) & (featured_data.Surface == 'Dirt')
-featured_data[
-    'Jockey winning % in the last 1000 days at middle distances on dirt'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distante lungi, pe iarba
-mask = ((featured_data.Distance == 2000) | (featured_data.Distance == 2200) | (featured_data.Distance == 2400)) & (
-        featured_data.Surface == 'Gress')
-featured_data[
-    'Jockey winning % in the last 1000 days at long distance on grass'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distante lungi, pe pamant
-mask = ((featured_data.Distance == 2000) | (featured_data.Distance == 2200) | (featured_data.Distance == 2400)) & (
-        featured_data.Surface == 'Dirt')
-featured_data[
-    'Jockey winning % in the last 1000 days at long distance on dirt'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile, pe cele trei tipuri de distante si pe cele doua tipuri de suprafete
+for i in range(3):
+    for j in range(2):
+        mask, text = return_mask_and_text_from_distances_and_surfaces(featured_data, i, j,
+                                                                      'Jockey winning % in the last 1000 days')
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile
 featured_data[
