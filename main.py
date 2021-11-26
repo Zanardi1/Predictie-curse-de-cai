@@ -60,7 +60,7 @@ def compute_trainer_win_percent_in_last_days(data, no_days, mask=''):
         data['Win'] = data['Plassering'].eq(1)
         s = (data.loc[mask].reset_index().groupby('TrainerID').rolling(no_days, on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
-        data = drop(columns='Win')
+        data = data.drop(columns='Win')
     return s
 
 
@@ -76,6 +76,15 @@ def compute_jockey_win_percent_in_last_days(data, no_days, mask=''):
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
         data = data.drop(columns='Win')
     return s
+
+
+def compute_jockey_average_final_position_in_last_days(data, no_days, mask=''):
+    if len(mask) == 0:
+        return (data.set_index('Dato').groupby(['JockeyId', pd.Grouper(freq=no_days)])['Plassering'].transform(
+            lambda x: x.expanding().mean()).to_numpy())
+    else:
+        return (data[mask].set_index('Dato').groupby(['JockeyId', 'Track', pd.Grouper(freq=no_days)])[
+                    'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
 
 
 # Calculez Last FGrating total
@@ -436,57 +445,51 @@ featured_data[
     featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile
-featured_data['Average Position of a jockey in the last 1000 days'] = \
-    (featured_data.set_index('Dato').groupby(['JockeyId', pd.Grouper(freq='1000D')])['Plassering'].transform(
-        lambda x: x.expanding().mean()).to_numpy())
+featured_data[
+    'Average Position of a jockey in the last 1000 days'] = compute_jockey_average_final_position_in_last_days(
+    featured_data, '1000D')
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe Sha Tin
 mask = featured_data['Track'].eq('Sha Tin')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days at Sha Tin'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Track', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+featured_data.loc[
+    mask, 'Average Position of a jockey in the last 1000 days at Sha Tin'] = compute_jockey_average_final_position_in_last_days(
+    featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe Happy Valley
 mask = featured_data['Track'].eq('Happy Valley')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days at Happy Valley'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Track', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+featured_data.loc[
+    mask, 'Average Position of a jockey in the last 1000 days at Happy Valley'] = compute_jockey_average_final_position_in_last_days(
+    featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe iarba
 mask = featured_data['Surface'].eq('Gress')
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe pamant
 mask = featured_data['Surface'].eq('Dirt')
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on dirt'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe Sha Tin - iarba
 mask = featured_data['Track'].eq('Sha Tin') & featured_data['Surface'].eq('Gress')
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on Sha Tin grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Track', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe Sha Tin - pamant
 mask = featured_data['Track'].eq('Sha Tin') & featured_data['Surface'].eq('Dirt')
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on Sha Tin dirt'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Track', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe Happy Valley - iarba
 mask = featured_data['Track'].eq('Happy Valley') & featured_data['Surface'].eq('Gress')
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on Happy Valley grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Track', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe distante scurte
 mask = (featured_data['Distance'].eq(1000)) | (featured_data['Distance'].eq(1200))
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days at sprint distances'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Distance', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe distante medii
 mask = (featured_data['Distance'].eq(1400)) | (featured_data['Distance'].eq(1600)) | (
