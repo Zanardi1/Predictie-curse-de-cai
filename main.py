@@ -87,6 +87,23 @@ def compute_jockey_average_final_position_in_last_days(data, no_days, mask=''):
                     'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
 
 
+def compute_jockey_mean_path_in_last_days(data, no_days, mask=''):
+    if len(mask) == 0:
+        return data.set_index('Dato').groupby(['JockeyId', pd.Grouper(freq='1000D')])['Path'].transform(
+            lambda x: x.expanding().mean()).to_numpy()
+    else:
+        return data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
+            'Path'].transform(lambda x: x.expanding().mean()).to_numpy()
+
+
+def compute_horse_win_percentage(data):
+    data['Win'] = data['Plassering'].eq(1)
+    s = (data.reset_index().groupby('HorseId').rolling('1000D', on='Dato').agg(
+        {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+    data = data.drop(columns='Win')
+    return s
+
+
 # Calculez Last FGrating total
 featured_data['Last FGrating'] = compute_last_fgrating(featured_data)
 
@@ -115,7 +132,8 @@ featured_data['Last Final Position at Sha-Tin Dirt'] = compute_last_final_positi
 
 # Calculez Pozitia finala pentru Happy Valley - iarba
 mask = (featured_data.Track == 'Happy Valley') & (featured_data.Surface == 'Gress')
-featured_data['Last Final Position at Happy Valley Grass'] = compute_last_final_position(featured_data, mask=mask)
+featured_data['Last Final Position at Happy Valley Grass'] = compute_last_final_position(featured_data,
+                                                                                         mask=mask)
 
 # Calculez Last FGrating pentru distanta de 1000 m
 mask = featured_data.Distance == 1000
@@ -206,16 +224,20 @@ temp = pd.DataFrame()
 del temp
 
 # Calculez FGrating mediu in ultimele 10 starturi pentru fiecare cal
-featured_data['Average FGrating in the last 10 starts'] = compute_average_fgrating_in_last_starts(featured_data, 10)
+featured_data['Average FGrating in the last 10 starts'] = compute_average_fgrating_in_last_starts(featured_data,
+                                                                                                  10)
 
 # Calculez pozitia finala madie in ultimele 10 starturi pentru fiecare cal
-featured_data['Average Position in the last 10 starts'] = compute_average_position_in_last_starts(featured_data, 10)
+featured_data['Average Position in the last 10 starts'] = compute_average_position_in_last_starts(featured_data,
+                                                                                                  10)
 
 # Calculez FGrating mediu in ultimele 4 starturi pentru fiecare cal
-featured_data['Average FGrating in the last 4 starts'] = compute_average_fgrating_in_last_starts(featured_data, 4)
+featured_data['Average FGrating in the last 4 starts'] = compute_average_fgrating_in_last_starts(featured_data,
+                                                                                                 4)
 
 # Calculez pozitia finala madie in ultimele 4 starturi pentru fiecare cal
-featured_data['Average Position in the last 4 starts'] = compute_average_position_in_last_starts(featured_data, 4)
+featured_data['Average Position in the last 4 starts'] = compute_average_position_in_last_starts(featured_data,
+                                                                                                 4)
 
 # Calculez FGrating mediu pentru Sha Tin - iarba, pentru fiecare cal
 mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Gress')
@@ -246,8 +268,9 @@ mask = (featured_data.Distance == 1000) | (featured_data.Distance == 1200)
 featured_data['Average FGrating at sprint distances'] = compute_average_fg_rating(featured_data, mask=mask)
 
 # Calculez FGrating mediu pentru distantele medii, pentru fiecare cal
-mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (featured_data.Distance == 1650) | (
-        featured_data.Distance == 1800)
+mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (
+        featured_data.Distance == 1650) | (
+               featured_data.Distance == 1800)
 featured_data['Average FGrating at medium distances'] = compute_average_fg_rating(featured_data, mask=mask)
 
 # Calculez FGrating mediu pentru distantele mari, pentru fiecare cal
@@ -259,8 +282,9 @@ mask = ((featured_data.Distance == 1000) | (featured_data.Distance == 1200))
 featured_data['Average Position at sprint distances'] = compute_average_position(featured_data, mask=mask)
 
 # Calculez pozitia medie pentru distantele medii, pentru fiecare cal
-mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (featured_data.Distance == 1650) | (
-        featured_data.Distance == 1800)
+mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (
+        featured_data.Distance == 1650) | (
+               featured_data.Distance == 1800)
 featured_data['Average Position at medium distances'] = compute_average_position(featured_data, mask=mask)
 
 # Calculez pozitia medie pentru distantele medii, pentru fiecare cal
@@ -287,8 +311,9 @@ mask = (featured_data.Distance == 1000) | (featured_data.Distance == 1200)
 featured_data['Maximum FGrating at sprint distances'] = compute_max_fg_rating(featured_data, mask=mask)
 
 # Calculez FGrating maxim pentru distante medii
-mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (featured_data.Distance == 1650) | (
-        featured_data.Distance == 1800)
+mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (
+        featured_data.Distance == 1650) | (
+               featured_data.Distance == 1800)
 featured_data['Maximum FGrating at medium distances'] = compute_max_fg_rating(featured_data, mask=mask)
 
 # Calculez FGrating maxim pentru distante lungi
@@ -300,7 +325,8 @@ featured_data['Maximum FGrating in last 3 starts'] = featured_data.groupby('Hors
     lambda x: x.shift().expanding(min_periods=3).max())
 
 # Calculez daca o anumita cursa a fost varf de forma
-featured_data['Top'] = ((featured_data['FGrating'] - featured_data['Maximum FGrating'] >= 4).map({True: 1, False: 0}))
+featured_data['Top'] = (
+    (featured_data['FGrating'] - featured_data['Maximum FGrating'] >= 4).map({True: 1, False: 0}))
 
 # Calculez numarul de zile de la ultima cursa
 featured_data['Days since last race'] = featured_data.groupby('HorseId')['Dato'].diff()
@@ -309,14 +335,18 @@ featured_data['Days since last race'] = featured_data.groupby('HorseId')['Dato']
 featured_data['Trainer winning % in the last 1000 days'] = compute_trainer_win_percent_in_last_days(featured_data,
                                                                                                     '1000D')
 # Calculez procentajul de victorii ale unui antrenor in ultimele 90 de zile
-featured_data['Trainer winning % in the last 90 days'] = compute_trainer_win_percent_in_last_days(featured_data, '90D')
+featured_data['Trainer winning % in the last 90 days'] = compute_trainer_win_percent_in_last_days(featured_data,
+                                                                                                  '90D')
 
 # Calculez procentajul de victorii ale unui antrenor in ultimele 30 de zile
-featured_data['Trainer winning % in the last 30 days'] = compute_trainer_win_percent_in_last_days(featured_data, '30D')
+featured_data['Trainer winning % in the last 30 days'] = compute_trainer_win_percent_in_last_days(featured_data,
+                                                                                                  '30D')
 
 # Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distante de sprint
 mask = (featured_data.Distance == 1000) | (featured_data.Distance == 1200)
-featured_data['Trainer winning % in the last 1000 days at sprint distances'] = compute_trainer_win_percent_in_last_days(
+featured_data[
+    'Trainer winning % in the last 1000 days at sprint distances'] = compute_trainer_win_percent_in_last_days(
+
     featured_data, '1000D', mask=mask)
 
 # Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distante medii
@@ -495,148 +525,122 @@ featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days at s
 mask = (featured_data['Distance'].eq(1400)) | (featured_data['Distance'].eq(1600)) | (
     featured_data['Distance'].eq(1650)) | (featured_data['Distance'].eq(1800))
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days at middle distances'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Distance', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe distante lungi
 mask = (featured_data['Distance'].eq(2000)) | (featured_data['Distance']).eq(2200) | (featured_data['Distance']).eq(
     2400)
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on 2000 m'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Distance', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante scurte
 mask = ((featured_data['Distance'].eq(1000)) | (featured_data['Distance'].eq(1200))) & (
     featured_data['Surface'].eq('Gress'))
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on sprint distances, grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Distance', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante medii
 mask = ((featured_data['Distance'].eq(1400)) | (featured_data['Distance']).eq(1600) | (
     featured_data['Distance'].eq(1650)) | (featured_data['Distance'].eq(1800))) & featured_data['Surface'].eq(
     'Gress')
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on middle distances, grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Distance', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante lungi
 mask = (featured_data['Distance'].eq(2000) | (featured_data['Distance'].eq(2200)) | (
     featured_data['Distance'].eq(2400))) & featured_data['Surface'].eq('Gress')
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on long distances, grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Distance', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante scurte
 mask = ((featured_data['Distance'].eq(1000)) | (featured_data['Distance'].eq(1200))) & featured_data['Surface'].eq(
     'Dirt')
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on sprint distances, dirt'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Distance', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante medii
 mask = ((featured_data['Distance'].eq(1400)) | (featured_data['Distance'].eq(1600)) | (
     featured_data['Distance'].eq(1650)) | (featured_data['Distance'].eq(1800))) & featured_data['Surface'].eq('Dirt')
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on middle distances, dirt'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Distance', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante lungi
 mask = ((featured_data['Distance'].eq(2000)) | (featured_data['Distance'].eq(2200)) | (
     featured_data['Distance'].eq(2400))) & featured_data['Surface'].eq('Dirt')
 featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on long distances, dirt'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Distance', pd.Grouper(freq='1000D')])[
-         'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile
 featured_data['Mean path of a jockey in the last 1000 days'] = \
-    (featured_data.set_index('Dato').groupby(['JockeyId', pd.Grouper(freq='1000D')])['Path'].transform(
-        lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D')
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe iarba
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe iarba
 mask = featured_data['Surface'].eq('Gress')
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe pamant
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe pamant
 mask = featured_data['Surface'].eq('Dirt')
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on dirt'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe Sha Tin - iarba
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe Sha Tin - iarba
 mask = featured_data['Surface'].eq('Gress') & featured_data['Track'].eq('Sha Tin')
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on Sha Tin grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe Sha Tin - pamant
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe Sha Tin - pamant
 mask = featured_data['Surface'].eq('Dirt') & featured_data['Track'].eq('Sha Tin')
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on Sha Tin dirt'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe Happy Valley - iarba
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe Happy Valley - iarba
 mask = featured_data['Surface'].eq('Gress') & featured_data['Track'].eq('Happy Valley')
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on Happy Valley grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante de sprint
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante de sprint
 mask = featured_data['Surface'].eq('Gress') & (
         (featured_data['Distance'].eq(1000)) | (featured_data['Distance'].eq(1200)))
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on short distances, grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante medii
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante medii
 mask = featured_data['Surface'].eq('Gress') & (
         (featured_data['Distance'].eq(1400)) | (featured_data['Distance'].eq(1600)) | (
     featured_data['Distance'].eq(1650)) | (featured_data['Distance'].eq(1800)))
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on middle distances, grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante lungi
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante lungi
 mask = featured_data['Surface'].eq('Gress') & (
         (featured_data['Distance'].eq(2000)) | (featured_data['Distance'].eq(2200)) | (
     featured_data['Distance'].eq(2400)))
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on long distances, grass'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante scurte
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante scurte
 mask = featured_data['Surface'].eq('Dirt') & (
         (featured_data['Distance'].eq(1000)) | (featured_data['Distance'].eq(1200)))
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on short distances, dirt'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante medii
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante medii
 mask = featured_data['Surface'].eq('Dirt') & (
         (featured_data['Distance'].eq(1400)) | (featured_data['Distance'].eq(1600)) | (
     featured_data['Distance'].eq(1650)) | (featured_data['Distance'].eq(1800)))
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on middle distances, dirt'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path) medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante lungi
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante lungi
 mask = featured_data['Surface'].eq('Dirt') & (
         (featured_data['Distance'].eq(2000)) | (featured_data['Distance'].eq(2200)) | (
     featured_data['Distance'].eq(2400)))
 featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on long distances, dirt'] = \
-    (featured_data[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-         'Path'].transform(lambda x: x.expanding().mean()).to_numpy())
+    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez procentajul de victorii ale unui cal
-featured_data['Win'] = featured_data['Plassering'].eq(1)
-s = (featured_data.reset_index().groupby('HorseId').rolling('1000D', on='Dato').agg(
-    {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
-featured_data['Horse winning %'] = s
-featured_data = featured_data.drop(columns='Win')
-s = pd.DataFrame()
-del s
+featured_data['Horse winning %'] = compute_horse_win_percentage(featured_data)
 
 featured_data = featured_data.sort_values(by=['Dato', 'Løpsnr', 'Plassering'])
 featured_data.to_excel('Date sortate.xlsx')
