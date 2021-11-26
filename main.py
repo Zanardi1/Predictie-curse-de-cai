@@ -1,5 +1,7 @@
 import pandas as pd
 
+distances_list = [1000, 1200, 1400, 1600, 1650, 1800, 2000, 2200, 2400]
+
 raw_data = pd.read_excel('Data.xlsx')
 print(raw_data.shape)
 print(raw_data.head())
@@ -31,14 +33,18 @@ def compute_average_position_in_last_starts(data, no_starts):
 
 def compute_average_fg_rating(data, mask=''):
     if len(mask) == 0:
-        pass
+        temp = data.groupby('HorseId')['FGrating']
+        data['cumsum'] = temp.apply(lambda p: p.shift(fill_value=0).cumsum())
+        return data['cumsum'] / temp.cumcount()
     else:
         return data.loc[mask].groupby('HorseId')['FGrating'].apply(lambda x: x.shift().expanding().mean())
 
 
 def compute_average_position(data, mask=''):
     if len(mask) == 0:
-        pass
+        temp = data.groupby('HorseId')['Plassering']
+        data['cumsum'] = temp.apply(lambda p: p.shift(fill_value=0).cumsum())
+        return data['cumsum'] / temp.cumcount()
     else:
         return data.loc[mask].groupby('HorseId')['Plassering'].apply(lambda x: x.shift().expanding().mean())
 
@@ -104,221 +110,124 @@ def compute_horse_win_percentage(data):
     return s
 
 
+def return_mask_and_text_from_tracks(data, track_no, metric):
+    if track_no == 0:  # Sha Tin - iarba
+        mask = (data.Track == 'Sha Tin') & (data.Surface == 'Gress')
+        text = str(metric) + ' at Sha-Tin Grass'
+    if track_no == 1:  # Sha Tin - pamant
+        mask = (data.Track == 'Sha Tin') & (data.Surface == 'Dirt')
+        text = str(metric) + ' at Sha-Tin Dirt'
+    if track_no == 2:  # Happy Valley - iarba
+        mask = (data.Track == 'Happy Valley') & (data.Surface == 'Gress')
+        text = str(metric) + ' at Happy Valley Grass'
+    if track_no == 3:  # Sha Tin, indiferent de suprafata
+        mask = data.Track == 'Sha Tin'
+        text = str(metric) + ' at Sha-Tin'
+    if track_no == 4:  # Happy Valley, indiferent de suprafata
+        mask = data.Track == 'Happy Valley'
+        text = str(metric) + ' at Happy Valley'
+    return mask, text
+
+
+def return_mask_and_text_from_distances(data, distance_type, metric):
+    if distance_type == 0:  # Distante de sprint
+        mask = (data.Distance == 1000) | (data.Distance == 1200)
+        text = str(metric) + ' at sprint distances'
+    if distance_type == 1:  # Distanta medie
+        mask = (data.Distance == 1400) | (data.Distance == 1600) | (data.Distance == 1650) | (data.Distance == 1800)
+        text = str(metric) + ' at medium distances'
+    if distance_type == 2:  # Distante lungi
+        mask = (data.Distance == 2000) | (data.Distance == 2200) | (data.Distance == 2400)
+        text = str(metric) + ' at long distances'
+    return mask, text
+
+
+def return_mask_and_text_from_surfaces(data, surface_name, metric):
+    if surface_name == 0:  # Iarba
+        mask = data.Surface == 'Gress'
+        text = str(metric) + ' on grass'
+    if surface_name == 1:  # pamant
+        mask = data.Surface == 'Dirt'
+        text = str(metric) + ' on dirt'
+    return mask, text
+
+
 # Calculez Last FGrating total
 featured_data['Last FGrating'] = compute_last_fgrating(featured_data)
 
 # Calculez Last Final Position total
 featured_data['Last Plassering'] = compute_last_final_position(featured_data)
 
-# Calculez Last FGrating pentru Sha-Tin - iarba
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Gress')
-featured_data['Last FGrating at Sha-Tin Grass'] = compute_last_fgrating(featured_data, mask=mask)
+# Calculez Last FGrating pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
+for i in range(3):
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Last FGrating')
+    featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
 
-# Calculez Last FGrating pentru Sha-Tin - pamant
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Dirt')
-featured_data['Last FGrating at Sha-Tin Dirt'] = compute_last_fgrating(featured_data, mask=mask)
+# Calculez pozitia finala pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
+for i in range(3):
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Final Position')
+    featured_data[text] = compute_last_final_position(featured_data, mask=mask)
 
-# Calculez Last FGrating pentru Happy Valley - iarba
-mask = (featured_data.Track == 'Happy Valley') & (featured_data.Surface == 'Gress')
-featured_data['Last FGrating at Happy Valley Grass'] = compute_last_fgrating(featured_data, mask=mask)
+# Calculez Last FGrating pentru fiecare distanta
+for distance in distances_list:
+    mask = featured_data.Distance == distance
+    text = 'Last FGRating at ' + str(distance) + ' m'
+    featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
 
-# Calculez Pozitia finala pentru Sha-Tin - iarba
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Gress')
-featured_data['Last Final Position at Sha-Tin Grass'] = compute_last_final_position(featured_data, mask=mask)
-
-# Calculez Pozitia finala pentru Sha-Tin - pamant
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Dirt')
-featured_data['Last Final Position at Sha-Tin Dirt'] = compute_last_final_position(featured_data, mask=mask)
-
-# Calculez Pozitia finala pentru Happy Valley - iarba
-mask = (featured_data.Track == 'Happy Valley') & (featured_data.Surface == 'Gress')
-featured_data['Last Final Position at Happy Valley Grass'] = compute_last_final_position(featured_data,
-                                                                                         mask=mask)
-
-# Calculez Last FGrating pentru distanta de 1000 m
-mask = featured_data.Distance == 1000
-featured_data['Last FGrating at 1000 m'] = compute_last_fgrating(featured_data, mask=mask)
-
-# Calculez Last FGrating pentru distanta de 1200 m
-mask = featured_data.Distance == 1200
-featured_data['Last FGrating at 1200 m'] = compute_last_fgrating(featured_data, mask=mask)
-
-# Calculez Last FGrating pentru distanta de 1400 m
-mask = featured_data.Distance == 1400
-featured_data['Last FGrating at 1400 m'] = compute_last_fgrating(featured_data, mask=mask)
-
-# Calculez Last FGrating pentru distanta de 1600 m
-mask = featured_data.Distance == 1600
-featured_data['Last FGrating at 1600 m'] = compute_last_fgrating(featured_data, mask=mask)
-
-# Calculez Last FGrating pentru distanta de 1650 m
-mask = featured_data.Distance == 1650
-featured_data['Last FGrating at 1650 m'] = compute_last_fgrating(featured_data, mask=mask)
-
-# Calculez Last FGrating pentru distanta de 1800 m
-mask = featured_data.Distance == 1800
-featured_data['Last FGrating at 1800 m'] = compute_last_fgrating(featured_data, mask=mask)
-
-# Calculez Last FGrating pentru distanta de 2000 m
-mask = featured_data.Distance == 2000
-featured_data['Last FGrating at 2000 m'] = compute_last_fgrating(featured_data, mask=mask)
-
-# Calculez Last FGrating pentru distanta de 2200 m
-mask = featured_data.Distance == 2200
-featured_data['Last FGrating at 2200 m'] = compute_last_fgrating(featured_data, mask=mask)
-
-# Calculez Last FGrating pentru distanta de 2400 m
-mask = featured_data.Distance == 2400
-featured_data['Last FGrating at 2400 m'] = compute_last_fgrating(featured_data, mask=mask)
-
-# Calculez pozitia finala pentru distanta de 1000 m
-mask = featured_data.Distance == 1000
-featured_data['Last Final Position at 1000 m'] = compute_last_final_position(featured_data, mask=mask)
-
-# Calculez pozitia finala pentru distanta de 1200 m
-mask = (featured_data.Distance == 1200)
-featured_data['Last Final Position at 1200 m'] = compute_last_final_position(featured_data, mask=mask)
-
-# Calculez pozitia finala pentru distanta de 1400 m
-mask = featured_data.Distance == 1400
-featured_data['Last Final Position at 1400 m'] = compute_last_final_position(featured_data, mask=mask)
-
-# Calculez pozitia finala pentru distanta de 1600 m
-mask = featured_data.Distance == 1600
-featured_data['Last Final Position at 1600 m'] = compute_last_final_position(featured_data, mask=mask)
-
-# Calculez pozitia finala pentru distanta de 1650 m
-mask = featured_data.Distance == 1650
-featured_data['Last Final Position at 1650 m'] = compute_last_final_position(featured_data, mask=mask)
-
-# Calculez pozitia finala pentru distanta de 1800 m
-mask = featured_data.Distance == 1800
-featured_data['Last Final Position at 1800 m'] = compute_last_final_position(featured_data, mask=mask)
-
-# Calculez pozitia finala pentru distanta de 2000 m
-mask = featured_data.Distance == 2000
-featured_data['Last Final Position at 2000 m'] = compute_last_final_position(featured_data, mask=mask)
-
-# Calculez pozitia finala pentru distanta de 2200 m
-mask = featured_data.Distance == 2200
-featured_data['Last Final Position at 2200 m'] = compute_last_final_position(featured_data, mask=mask)
-
-# Calculez pozitia finala pentru distanta de 2400 m
-mask = featured_data.Distance == 2400
-featured_data['Last Final Position at 2400 m'] = compute_last_final_position(featured_data, mask=mask)
+# Calculez ultima pozitie finala pentru fiecare distanta
+for distance in distances_list:
+    mask = featured_data.Distance == distance
+    text = 'Last Final Position at ' + str(distance) + ' m'
+    featured_data[text] = compute_last_final_position(featured_data, mask=mask)
 
 # Calculez FGrating mediu total al fiecarui cal
-temp = featured_data.groupby('HorseId')['FGrating']
-featured_data['cumsum'] = temp.apply(lambda p: p.shift(fill_value=0).cumsum())
-featured_data['Average FGrating'] = featured_data['cumsum'] / temp.cumcount()
-featured_data = featured_data.drop(columns='cumsum')
-temp = pd.DataFrame()
-del temp
+featured_data['Average FGrating'] = compute_average_fg_rating(featured_data)
 
 # Calculez pozitia medie totala pe fiecare cal
-temp = featured_data.groupby('HorseId')['Plassering']
-featured_data['cumsum'] = temp.apply(lambda p: p.shift(fill_value=0).cumsum())
-featured_data['Average Position'] = featured_data['cumsum'] / temp.cumcount()
-featured_data = featured_data.drop(columns='cumsum')
-temp = pd.DataFrame()
-del temp
+featured_data['Average Position'] = compute_average_position(featured_data)
 
-# Calculez FGrating mediu in ultimele 10 starturi pentru fiecare cal
-featured_data['Average FGrating in the last 10 starts'] = compute_average_fgrating_in_last_starts(featured_data,
-                                                                                                  10)
+# Calculez FGrating mediu in ultimele 10, respectiv 4 starturi pentru fiecare cal
+for i in [10, 4]:
+    text = 'Average FGrating in the last ' + str(i) + ' starts'
+    featured_data[text] = compute_average_fgrating_in_last_starts(featured_data, i)
 
-# Calculez pozitia finala madie in ultimele 10 starturi pentru fiecare cal
-featured_data['Average Position in the last 10 starts'] = compute_average_position_in_last_starts(featured_data,
-                                                                                                  10)
+# Calculez pozitia finala medie in ultimele 10, respectiv 4 starturi pentru fiecare cal
+for i in [10, 4]:
+    text = 'Average Position in the last ' + str(i) + 'starts'
+    featured_data[text] = compute_average_position_in_last_starts(featured_data, i)
 
-# Calculez FGrating mediu in ultimele 4 starturi pentru fiecare cal
-featured_data['Average FGrating in the last 4 starts'] = compute_average_fgrating_in_last_starts(featured_data,
-                                                                                                 4)
+# Calculez FGrating mediu pentru fiecare dinte cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
+for i in range(3):
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Average FGrating')
+    featured_data[text] = compute_average_fg_rating(featured_data, mask=mask)
 
-# Calculez pozitia finala madie in ultimele 4 starturi pentru fiecare cal
-featured_data['Average Position in the last 4 starts'] = compute_average_position_in_last_starts(featured_data,
-                                                                                                 4)
+# Calculez pozitia medie pentru fiecare dinte cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
+for i in range(3):
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Average Position')
+    featured_data[text] = compute_average_position(featured_data, mask=mask)
 
-# Calculez FGrating mediu pentru Sha Tin - iarba, pentru fiecare cal
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Gress')
-featured_data['Average FGrating at Sha Tin Grass'] = compute_average_fg_rating(featured_data, mask=mask)
+# Calculez FGrating mediu pentru cele trei tipuri de distante pentru fiecare cal
+for i in range(3):
+    mask, text = return_mask_and_text_from_distances(featured_data, i, 'Average FGrating')
+    featured_data[text] = compute_average_fg_rating(featured_data, mask=mask)
 
-# Calculez FGrating mediu pentru Sha Tin - pamant, pentru fiecare cal
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Dirt')
-featured_data['Average FGrating at Sha Tin Dirt'] = compute_average_fg_rating(featured_data, mask=mask)
-
-# Calculez FGrating mediu pentru Happy Valley - iarba, pentru fiecare cal
-mask = (featured_data.Track == 'Happy Valley') & (featured_data.Surface == 'Gress')
-featured_data['Average FGrating at Happy Valley Grass'] = compute_average_fg_rating(featured_data, mask=mask)
-
-# Calculez pozitia medie pentru Sha-Tin - iarba pentru fiecare cal
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Gress')
-featured_data['Average Position at Sha Tin Grass'] = compute_average_position(featured_data, mask=mask)
-
-# Calculez pozitia medie pentru Sha-Tin - pamant pentru fiecare cal
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Dirt')
-featured_data['Average Position at Sha Tin Dirt'] = compute_average_position(featured_data, mask=mask)
-
-# Calculez pozitia medie pentru Happy Valley - iarba pentru fiecare cal
-mask = (featured_data.Track == 'Happy Valley') & (featured_data.Surface == 'Gress')
-featured_data['Average FGrating at Happy Valley Grass'] = compute_average_position(featured_data, mask=mask)
-
-# Calculez FGrating mediu pentru distantele de sprint, pentru fiecare cal
-mask = (featured_data.Distance == 1000) | (featured_data.Distance == 1200)
-featured_data['Average FGrating at sprint distances'] = compute_average_fg_rating(featured_data, mask=mask)
-
-# Calculez FGrating mediu pentru distantele medii, pentru fiecare cal
-mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (
-        featured_data.Distance == 1650) | (
-               featured_data.Distance == 1800)
-featured_data['Average FGrating at medium distances'] = compute_average_fg_rating(featured_data, mask=mask)
-
-# Calculez FGrating mediu pentru distantele mari, pentru fiecare cal
-mask = (featured_data.Distance == 2000) | (featured_data.Distance == 2200) | (featured_data.Distance == 2400)
-featured_data['Average FGrating at long distances'] = compute_average_fg_rating(featured_data, mask=mask)
-
-# Calculez pozitia medie pentru distantele de sprint, pentru fiecare cal
-mask = ((featured_data.Distance == 1000) | (featured_data.Distance == 1200))
-featured_data['Average Position at sprint distances'] = compute_average_position(featured_data, mask=mask)
-
-# Calculez pozitia medie pentru distantele medii, pentru fiecare cal
-mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (
-        featured_data.Distance == 1650) | (
-               featured_data.Distance == 1800)
-featured_data['Average Position at medium distances'] = compute_average_position(featured_data, mask=mask)
-
-# Calculez pozitia medie pentru distantele medii, pentru fiecare cal
-mask = (featured_data.Distance == 2000) | (featured_data.Distance == 2200) | (featured_data.Distance == 2400)
-featured_data['Average Position at long distances'] = compute_average_position(featured_data, mask=mask)
+# Calculez pozitia medie pentru cele trei tipuri de distante pentru fiecare cal
+for i in range(3):
+    mask, text = return_mask_and_text_from_distances(featured_data, i, 'Average Position')
+    featured_data[text] = compute_average_position(featured_data, mask=mask)
 
 # Calculez FGrating maxim pentru fiecare cal
 featured_data['Maximum FGrating'] = compute_max_fg_rating(featured_data)
 
-# Calculez FGrating maxim pentru Sha-Tin - iarba
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Gress')
-featured_data['Maximum FGrating at Sha Tin Grass'] = compute_max_fg_rating(featured_data, mask=mask)
+# Calculez FGrating maxim pentru cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass, pentru fiecare cal
+for i in range(3):
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Maximum FGrating')
+    featured_data[text] = compute_max_fg_rating(featured_data, mask=mask)
 
-# Calculez FGrating maxim pentru Sha-Tin - pamant
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Dirt')
-featured_data['Maximum FGrating at Sha Tin Dirt'] = compute_max_fg_rating(featured_data, mask=mask)
-
-# Calculez FGrating maxim pentru Happy Valley - iarba
-mask = (featured_data.Track == 'Happy Valley') & (featured_data.Surface == 'Gress')
-featured_data['Maximum FGrating at Happy Valley Grass'] = compute_max_fg_rating(featured_data, mask=mask)
-
-# Calculez FGrating maxim pentru distante de sprint
-mask = (featured_data.Distance == 1000) | (featured_data.Distance == 1200)
-featured_data['Maximum FGrating at sprint distances'] = compute_max_fg_rating(featured_data, mask=mask)
-
-# Calculez FGrating maxim pentru distante medii
-mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (
-        featured_data.Distance == 1650) | (
-               featured_data.Distance == 1800)
-featured_data['Maximum FGrating at medium distances'] = compute_max_fg_rating(featured_data, mask=mask)
-
-# Calculez FGrating maxim pentru distante lungi
-mask = (featured_data.Distance == 2000) | (featured_data.Distance == 2200) | (featured_data.Distance == 2400)
-featured_data['Maximum FGrating at long distances'] = compute_max_fg_rating(featured_data, mask=mask)
+# Calculez FGrating maxim pentru cele trei tipuri de distante, pentru fiecare cal
+for i in range(3):
+    mask, text = return_mask_and_text_from_distances(featured_data, i, 'Maximum FGrating')
+    featured_data[text] = compute_max_fg_rating(featured_data, mask=mask)
 
 # Calculez FGrating maxim pentru fiecare cal din ultimele trei starturi
 featured_data['Maximum FGrating in last 3 starts'] = featured_data.groupby('HorseId')['FGrating'].apply(
@@ -331,107 +240,46 @@ featured_data['Top'] = (
 # Calculez numarul de zile de la ultima cursa
 featured_data['Days since last race'] = featured_data.groupby('HorseId')['Dato'].diff()
 
-# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile
-featured_data['Trainer winning % in the last 1000 days'] = compute_trainer_win_percent_in_last_days(featured_data,
-                                                                                                    '1000D')
-# Calculez procentajul de victorii ale unui antrenor in ultimele 90 de zile
-featured_data['Trainer winning % in the last 90 days'] = compute_trainer_win_percent_in_last_days(featured_data,
-                                                                                                  '90D')
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000, 90, respectiv 30 de zile
+for i in [1000, 90, 30]:
+    text = 'Trainer winning % in the last ' + str(i) + ' days'
+    time_length = str(i) + 'D'
+    featured_data[text] = compute_trainer_win_percent_in_last_days(featured_data, time_length)
 
-# Calculez procentajul de victorii ale unui antrenor in ultimele 30 de zile
-featured_data['Trainer winning % in the last 30 days'] = compute_trainer_win_percent_in_last_days(featured_data,
-                                                                                                  '30D')
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile, pe cele trei distante
+for i in range(3):
+    mask, text = return_mask_and_text_from_distances(featured_data, i, 'Trainer winning % in the last 1000 days ')
+    featured_data[text] = compute_trainer_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distante de sprint
-mask = (featured_data.Distance == 1000) | (featured_data.Distance == 1200)
-featured_data[
-    'Trainer winning % in the last 1000 days at sprint distances'] = compute_trainer_win_percent_in_last_days(
-
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distante medii
-mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (featured_data.Distance == 1650) | (
-        featured_data.Distance == 1800)
-featured_data['Trainer winning % in the last 1000 days at middle distances'] = compute_trainer_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile pe distante lungi
-mask = (featured_data.Distance == 2000) | (featured_data.Distance == 2200) | (
-        featured_data.Distance == 2400)
-featured_data['Trainer winning % in the last 1000 days at long distances'] = compute_trainer_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile la Sha-Tin - iarba
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Gress')
-featured_data['Trainer winning % in the last 1000 days at Sha Tin Grass'] = compute_trainer_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile la Sha-Tin - pamant
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Dirt')
-featured_data['Trainer winning % in the last 1000 days at Sha Tin Dirt'] = compute_trainer_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile la Happy Valley - iarba
-mask = (featured_data.Track == 'Happy Valley') & (featured_data.Surface == 'Gress')
-featured_data['Trainer winning % in the last 1000 days at Sha Tin Grass'] = compute_trainer_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
+# Calculez procentajul de victorii ale unui antrenor, in ultimele 1000 de zile, pe cele trei piste
+for i in range(3):
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Trainer winning % in the last 1000 days ')
+    featured_data[text] = compute_trainer_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile
 featured_data['Jockey winning % in the last 1000 days'] = compute_jockey_win_percent_in_last_days(featured_data,
                                                                                                   '1000D')
 
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe Sha Tin
-mask = featured_data.Track == 'Sha Tin'
-featured_data['Jockey winning % in the last 1000 days at Sha Tin'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe cele trei piste, precum si pe piste,
+# dar indiferent de suprafata
+for i in range(5):
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Jockey winning % in the last 1000 days ')
+    featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe Happy Valley
-mask = featured_data.Track == 'Happy Valley'
-featured_data['Jockey winning % in the last 1000 days at Happy Valley'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare suprafata
+for i in [0, 1]:
+    mask, text = return_mask_and_text_from_surfaces(featured_data, i, 'Jockey winning % in the last 1000 days ')
+    featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe iarba
-mask = featured_data.Surface == 'Gress'
-featured_data['Jockey winning % in the last 1000 days on grass'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare pista
+for i in range(3):
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Jockey winning % in the last 1000 days ')
+    featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe pamant
-mask = featured_data.Surface == 'Dirt'
-featured_data['Jockey winning % in the last 1000 days on dirt'] = compute_jockey_win_percent_in_last_days(featured_data,
-                                                                                                          '1000D',
-                                                                                                          mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe Sha Tin - iarba
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Gress')
-featured_data['Jockey winning % in the last 1000 days at Sha Tin Grass'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe Sha Tin - pamant
-mask = (featured_data.Track == 'Sha Tin') & (featured_data.Surface == 'Dirt')
-featured_data['Jockey winning % in the last 1000 days at Sha Tin Dirt'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe Happy Valley - iarba
-mask = (featured_data.Track == 'Happy Valley') & (featured_data.Surface == 'Gress')
-featured_data['Jockey winning % in the last 1000 days at Happy Valley Grass'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distante de sprint
-mask = (featured_data.Distance == 1000) | (featured_data.Distance == 1200)
-featured_data['Jockey winning % in the last 1000 days at sprint distances'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distante medii
-mask = (featured_data.Distance == 1400) | (featured_data.Distance == 1600) | (featured_data.Distance == 1650) | (
-        featured_data.Distance == 1800)
-featured_data['Jockey winning % in the last 1000 days at middle distances'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
-
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distante lungi
-mask = (featured_data.Distance == 2000) | (featured_data.Distance == 2200) | (
-        featured_data.Distance == 2400)
-featured_data['Jockey winning % in the last 1000 days at long distances'] = compute_jockey_win_percent_in_last_days(
-    featured_data, '1000D', mask=mask)
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare distanta
+for i in range(3):
+    mask, text = return_mask_and_text_from_distances(featured_data, i, 'Jockey winning % in the last 1000 days ')
+    featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe distante scurte, pe iarba
 mask = ((featured_data.Distance == 1000) | (featured_data.Distance == 1200)) & (
@@ -642,6 +490,7 @@ featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on long dis
 # Calculez procentajul de victorii ale unui cal
 featured_data['Horse winning %'] = compute_horse_win_percentage(featured_data)
 
+featured_data = featured_data.drop(columns='cumsum')
 featured_data = featured_data.sort_values(by=['Dato', 'Løpsnr', 'Plassering'])
 featured_data.to_excel('Date sortate.xlsx')
 featured_data = pd.DataFrame()
