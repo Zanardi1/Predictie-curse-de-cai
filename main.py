@@ -57,30 +57,24 @@ def compute_max_fg_rating(data, mask=''):
 
 
 def compute_trainer_win_percent_in_last_days(data, no_days, mask=''):
+    data['Win'] = data['Plassering'].eq(1)
     if len(mask) == 0:
-        data['Win'] = featured_data['Plassering'].eq(1)
         s = (data.reset_index().groupby('TrainerID').rolling(no_days, on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
-        data = data.drop(columns='Win')
     else:
-        data['Win'] = data['Plassering'].eq(1)
         s = (data.loc[mask].reset_index().groupby('TrainerID').rolling(no_days, on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
-        data = data.drop(columns='Win')
     return s
 
 
 def compute_jockey_win_percent_in_last_days(data, no_days, mask=''):
+    data['Win'] = data['Plassering'].eq(1)
     if len(mask) == 0:
-        data['Win'] = data['Plassering'].eq(1)
         s = (data.reset_index().groupby('JockeyId').rolling(no_days, on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
-        data = data.drop(columns='Win')
     else:
-        data['Win'] = data['Plassering'].eq(1)
         s = (data.loc[mask].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
-        data = data.drop(columns='Win')
     return s
 
 
@@ -106,7 +100,6 @@ def compute_horse_win_percentage(data):
     data['Win'] = data['Plassering'].eq(1)
     s = (data.reset_index().groupby('HorseId').rolling('1000D', on='Dato').agg(
         {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
-    data = data.drop(columns='Win')
     return s
 
 
@@ -362,75 +355,28 @@ for i in range(3):
 featured_data['Mean path of a jockey in the last 1000 days'] = \
     compute_jockey_mean_path_in_last_days(featured_data, '1000D')
 
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe iarba
-mask = featured_data['Surface'].eq('Gress')
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on grass'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile, in functie de suprafata
+for i in range(2):
+    mask, text = return_mask_and_text_from_distances(featured_data, i, 'Mean path of a jockey in the last 1000 days')
+    featured_data.loc[mask, text] = compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe pamant
-mask = featured_data['Surface'].eq('Dirt')
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on dirt'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile, in functie de pista si suprafata
+for i in range(3):
+    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Mean path of a jockey in the last 1000 days')
+    featured_data.loc[mask, text] = compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe Sha Tin - iarba
-mask = featured_data['Surface'].eq('Gress') & featured_data['Track'].eq('Sha Tin')
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on Sha Tin grass'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe Sha Tin - pamant
-mask = featured_data['Surface'].eq('Dirt') & featured_data['Track'].eq('Sha Tin')
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on Sha Tin dirt'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe Happy Valley - iarba
-mask = featured_data['Surface'].eq('Gress') & featured_data['Track'].eq('Happy Valley')
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on Happy Valley grass'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante de sprint
-mask = featured_data['Surface'].eq('Gress') & (
-        (featured_data['Distance'].eq(1000)) | (featured_data['Distance'].eq(1200)))
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on short distances, grass'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante medii
-mask = featured_data['Surface'].eq('Gress') & (
-        (featured_data['Distance'].eq(1400)) | (featured_data['Distance'].eq(1600)) | (
-    featured_data['Distance'].eq(1650)) | (featured_data['Distance'].eq(1800)))
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on middle distances, grass'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante lungi
-mask = featured_data['Surface'].eq('Gress') & (
-        (featured_data['Distance'].eq(2000)) | (featured_data['Distance'].eq(2200)) | (
-    featured_data['Distance'].eq(2400)))
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on long distances, grass'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante scurte
-mask = featured_data['Surface'].eq('Dirt') & (
-        (featured_data['Distance'].eq(1000)) | (featured_data['Distance'].eq(1200)))
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on short distances, dirt'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante medii
-mask = featured_data['Surface'].eq('Dirt') & (
-        (featured_data['Distance'].eq(1400)) | (featured_data['Distance'].eq(1600)) | (
-    featured_data['Distance'].eq(1650)) | (featured_data['Distance'].eq(1800)))
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on middle distances, dirt'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante lungi
-mask = featured_data['Surface'].eq('Dirt') & (
-        (featured_data['Distance'].eq(2000)) | (featured_data['Distance'].eq(2200)) | (
-    featured_data['Distance'].eq(2400)))
-featured_data.loc[mask, 'Mean path of a jockey in the last 1000 days on long distances, dirt'] = \
-    compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
+# Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile, in functie de suprafata si distanta
+for i in range(3):
+    for j in range(2):
+        mask, text = return_mask_and_text_from_distances_and_surfaces(featured_data, i, j,
+                                                                      'Mean path of a jockey in the last 1000 days')
+        featured_data.loc[mask, text] = compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez procentajul de victorii ale unui cal
 featured_data['Horse winning %'] = compute_horse_win_percentage(featured_data)
 
 featured_data = featured_data.drop(columns='cumsum')
+featured_data = featured_data.drop(columns='Win')
 featured_data = featured_data.sort_values(by=['Dato', 'Løpsnr', 'Plassering'])
 featured_data.to_excel('Date sortate.xlsx')
 featured_data = pd.DataFrame()
