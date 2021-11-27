@@ -315,102 +315,48 @@ for i in range(3):
     for j in range(2):
         mask, text = return_mask_and_text_from_distances_and_surfaces(featured_data, i, j,
                                                                       'Jockey winning % in the last 1000 days')
+        featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile
 featured_data[
     'Average Position of a jockey in the last 1000 days'] = compute_jockey_average_final_position_in_last_days(
     featured_data, '1000D')
 
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe Sha Tin
-mask = featured_data['Track'].eq('Sha Tin')
-featured_data.loc[
-    mask, 'Average Position of a jockey in the last 1000 days at Sha Tin'] = compute_jockey_average_final_position_in_last_days(
-    featured_data, '1000D', mask=mask)
+# Calculez pozitia finala medie a unui jochei in ultimele 1000 de zile pe cele doua piste, indiferent de suprafata
+for i in [3, 4]:
+    mask, text = return_mask_and_text_from_tracks(featured_data, i,
+                                                  'Average Position of a jockey in the last 1000 days')
+    featured_data.loc[mask, text] = compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
+                                                                                       mask=mask)
 
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe Happy Valley
-mask = featured_data['Track'].eq('Happy Valley')
-featured_data.loc[
-    mask, 'Average Position of a jockey in the last 1000 days at Happy Valley'] = compute_jockey_average_final_position_in_last_days(
-    featured_data, '1000D', mask=mask)
+# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele doua suprafete
+for i in range(2):
+    mask, text = return_mask_and_text_from_surfaces(featured_data, i,
+                                                    'Average Position of a jockey in the last 1000 days')
+    featured_data.loc[mask, text] = compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
+                                                                                       mask=mask)
 
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe iarba
-mask = featured_data['Surface'].eq('Gress')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on grass'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
+# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele 2 piste, inclusiv suprafetele
+for i in range(3):
+    mask, text = return_mask_and_text_from_tracks(featured_data, i,
+                                                  'Average Position of a jockey in the last 1000 days')
+    featured_data.loc[mask, text] = compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
+                                                                                       mask=mask)
 
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe pamant
-mask = featured_data['Surface'].eq('Dirt')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on dirt'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
+# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele trei tipuri de distante
+for i in range(3):
+    mask, text = return_mask_and_text_from_distances(featured_data, i,
+                                                     'Average Position of a jockey in the last 1000 days')
+    featured_data.loc[mask, text] = compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
+                                                                                       mask=mask)
 
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe Sha Tin - iarba
-mask = featured_data['Track'].eq('Sha Tin') & featured_data['Surface'].eq('Gress')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on Sha Tin grass'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe Sha Tin - pamant
-mask = featured_data['Track'].eq('Sha Tin') & featured_data['Surface'].eq('Dirt')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on Sha Tin dirt'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe Happy Valley - iarba
-mask = featured_data['Track'].eq('Happy Valley') & featured_data['Surface'].eq('Gress')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on Happy Valley grass'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe distante scurte
-mask = (featured_data['Distance'].eq(1000)) | (featured_data['Distance'].eq(1200))
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days at sprint distances'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe distante medii
-mask = (featured_data['Distance'].eq(1400)) | (featured_data['Distance'].eq(1600)) | (
-    featured_data['Distance'].eq(1650)) | (featured_data['Distance'].eq(1800))
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days at middle distances'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe distante lungi
-mask = (featured_data['Distance'].eq(2000)) | (featured_data['Distance']).eq(2200) | (featured_data['Distance']).eq(
-    2400)
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on 2000 m'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante scurte
-mask = ((featured_data['Distance'].eq(1000)) | (featured_data['Distance'].eq(1200))) & (
-    featured_data['Surface'].eq('Gress'))
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on sprint distances, grass'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante medii
-mask = ((featured_data['Distance'].eq(1400)) | (featured_data['Distance']).eq(1600) | (
-    featured_data['Distance'].eq(1650)) | (featured_data['Distance'].eq(1800))) & featured_data['Surface'].eq(
-    'Gress')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on middle distances, grass'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe iarba, la distante lungi
-mask = (featured_data['Distance'].eq(2000) | (featured_data['Distance'].eq(2200)) | (
-    featured_data['Distance'].eq(2400))) & featured_data['Surface'].eq('Gress')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on long distances, grass'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante scurte
-mask = ((featured_data['Distance'].eq(1000)) | (featured_data['Distance'].eq(1200))) & featured_data['Surface'].eq(
-    'Dirt')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on sprint distances, dirt'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante medii
-mask = ((featured_data['Distance'].eq(1400)) | (featured_data['Distance'].eq(1600)) | (
-    featured_data['Distance'].eq(1650)) | (featured_data['Distance'].eq(1800))) & featured_data['Surface'].eq('Dirt')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on middle distances, dirt'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
-
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe pamant, la distante lungi
-mask = ((featured_data['Distance'].eq(2000)) | (featured_data['Distance'].eq(2200)) | (
-    featured_data['Distance'].eq(2400))) & featured_data['Surface'].eq('Dirt')
-featured_data.loc[mask, 'Average Position of a jockey in the last 1000 days on long distances, dirt'] = \
-    compute_jockey_average_final_position_in_last_days(featured_data, '1000D', mask=mask)
+# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele trei tipuri de distante si pe cele doua tipuri de suprafata
+for i in range(3):
+    for j in range(2):
+        mask, text = return_mask_and_text_from_distances_and_surfaces(featured_data, i, j,
+                                                                      'Average Position of a jockey in the last 1000 days')
+        featured_data.loc[mask, text] = compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
+                                                                                           mask=mask)
 
 # Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile
 featured_data['Mean path of a jockey in the last 1000 days'] = \
