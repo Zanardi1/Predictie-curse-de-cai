@@ -13,7 +13,8 @@ def compute_last_fgrating(data, mask=''):
     if len(mask) == 0:
         return data.groupby('HorseId')['FGrating'].apply(lambda x: x.shift(1))
     else:
-        return data.loc[mask][['HorseId', 'FGrating']].groupby('HorseId')['FGrating'].apply(lambda x: x.shift(1))
+        return data.loc[mask][['HorseId', 'FGrating']].groupby('HorseId')['FGrating'].apply(
+            lambda x: x.shift(1))
 
 
 def compute_last_final_position(data, mask=''):
@@ -181,20 +182,27 @@ featured_data['Last FGrating'] = compute_last_fgrating(featured_data)
 featured_data['Last Plassering'] = compute_last_final_position(featured_data)
 
 # Calculez Last FGrating pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
+# pentru fiecare cal
+
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Last FGrating')
     featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
+    featured_data[text] = featured_data[text].fillna(method='ffill').fillna(0)
 
 # Calculez pozitia finala pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
+# pentru fiecare cal
+
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Final Position')
     featured_data[text] = compute_last_final_position(featured_data, mask=mask)
+    featured_data[text] = featured_data[text].fillna(method='ffill').fillna(0)
 
-# Calculez Last FGrating pentru fiecare distanta
+# Calculez Last FGrating pentru fiecare distanta pentru fiecare cal
 for distance in distances_list:
     mask = featured_data.Distance == distance
     text = 'Last FGRating at ' + str(distance) + ' m'
     featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
+    featured_data[text] = featured_data[text].fillna(method='ffill').fillna(0)
 
 # Calculez ultima pozitie finala pentru fiecare distanta
 for distance in distances_list:
