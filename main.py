@@ -175,11 +175,15 @@ def return_mask_and_text_from_distances_and_surfaces(data, distance, surface_typ
     return mask, text
 
 
-# Calculez Last FGrating total
+# Calculez Last FGrating pentru fiecare cal
 featured_data['Last FGrating'] = compute_last_fgrating(featured_data)
+featured_data['Last FGrating'] = featured_data.groupby('HorseId')['Last FGrating'].apply(
+    lambda x: x.fillna(method='ffill').fillna(0))
 
-# Calculez Last Final Position total
+# Calculez Last Final Position pentru fiecare cal
 featured_data['Last Plassering'] = compute_last_final_position(featured_data)
+featured_data['Last Plassering'] = featured_data.groupby('HorseId')['Last Plassering'].apply(
+    lambda x: x.fillna(method='ffill').fillna(0))
 
 # Calculez Last FGrating pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
 # pentru fiecare cal
@@ -204,131 +208,167 @@ for distance in distances_list:
     featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
     featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
 
-# Calculez ultima pozitie finala pentru fiecare distanta
+# Calculez ultima pozitie finala pentru fiecare distanta pentru fiecare cal
 for distance in distances_list:
     mask = featured_data.Distance == distance
     text = 'Last Final Position at ' + str(distance) + ' m'
     featured_data[text] = compute_last_final_position(featured_data, mask=mask)
+    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
 
 # Calculez FGrating mediu total al fiecarui cal
 featured_data['Average FGrating'] = compute_average_fg_rating(featured_data)
+featured_data['Average FGrating'] = featured_data.groupby('HorseId')['Average FGrating'].fillna(method='ffill').fillna(
+    0)
 
 # Calculez pozitia medie totala pe fiecare cal
 featured_data['Average Position'] = compute_average_position(featured_data)
+featured_data['Average Position'] = featured_data.groupby('HorseId')['Average Position'].fillna(method='ffill').fillna(
+    0)
 
 # Calculez FGrating mediu in ultimele 10, respectiv 4 starturi pentru fiecare cal
 for i in [10, 4]:
     text = 'Average FGrating in the last ' + str(i) + ' starts'
     featured_data[text] = compute_average_fgrating_in_last_starts(featured_data, i)
+    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
 
 # Calculez pozitia finala medie in ultimele 10, respectiv 4 starturi pentru fiecare cal
 for i in [10, 4]:
     text = 'Average Position in the last ' + str(i) + 'starts'
     featured_data[text] = compute_average_position_in_last_starts(featured_data, i)
+    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
 
-# Calculez FGrating mediu pentru fiecare dinte cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
+# Calculez FGrating mediu pentru fiecare dintre cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
+# pentru fiecare cal
+
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Average FGrating')
     featured_data[text] = compute_average_fg_rating(featured_data, mask=mask)
+    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
 
 # Calculez pozitia medie pentru fiecare dinte cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
+# pentru fiecare cal
+
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Average Position')
     featured_data[text] = compute_average_position(featured_data, mask=mask)
+    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
 
 # Calculez FGrating mediu pentru cele trei tipuri de distante pentru fiecare cal
 for i in range(3):
     mask, text = return_mask_and_text_from_distances(featured_data, i, 'Average FGrating')
     featured_data[text] = compute_average_fg_rating(featured_data, mask=mask)
+    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
 
 # Calculez pozitia medie pentru cele trei tipuri de distante pentru fiecare cal
 for i in range(3):
     mask, text = return_mask_and_text_from_distances(featured_data, i, 'Average Position')
     featured_data[text] = compute_average_position(featured_data, mask=mask)
+    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
 
 # Calculez FGrating maxim pentru fiecare cal
 featured_data['Maximum FGrating'] = compute_max_fg_rating(featured_data)
+featured_data['Maximum FGrating'] = featured_data.groupby('HorseId')['Maximum FGrating'].fillna(method='ffill').fillna(
+    0)
 
 # Calculez FGrating maxim pentru cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass, pentru fiecare cal
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Maximum FGrating')
     featured_data[text] = compute_max_fg_rating(featured_data, mask=mask)
+    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
 
 # Calculez FGrating maxim pentru cele trei tipuri de distante, pentru fiecare cal
 for i in range(3):
     mask, text = return_mask_and_text_from_distances(featured_data, i, 'Maximum FGrating')
     featured_data[text] = compute_max_fg_rating(featured_data, mask=mask)
+    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
 
 # Calculez FGrating maxim pentru fiecare cal din ultimele trei starturi
 featured_data['Maximum FGrating in last 3 starts'] = featured_data.groupby('HorseId')['FGrating'].apply(
     lambda x: x.shift().expanding(min_periods=3).max())
+featured_data['Maximum FGrating in last 3 starts'] = featured_data.groupby('HorseId')[
+    'Maximum FGrating in last 3 starts'].fillna(method='ffill').fillna(0)
 
-# Calculez daca o anumita cursa a fost varf de forma
+# Calculez daca un cal a fost varf de forma intr-o anumita cursa
 featured_data['Top'] = (
     (featured_data['FGrating'] - featured_data['Maximum FGrating'] >= 4).map({True: 1, False: 0}))
 
-# Calculez numarul de zile de la ultima cursa
-featured_data['Days since last race'] = featured_data.groupby('HorseId')['Dato'].diff()
+# Calculez numarul de zile de la ultima cursa pentru fiecare cal
+featured_data['Days since last race'] = featured_data.groupby('HorseId')['Dato'].diff().fillna(method='ffill').fillna(
+    pd.NaT)
 
 # Calculez procentajul de victorii ale unui antrenor in ultimele 1000, 90, respectiv 30 de zile
 for i in [1000, 90, 30]:
     text = 'Trainer winning % in the last ' + str(i) + ' days'
     time_length = str(i) + 'D'
     featured_data[text] = compute_trainer_win_percent_in_last_days(featured_data, time_length)
+    featured_data[text] = featured_data.groupby('TrainerID')[text].fillna(method='ffill').fillna(0)
 
 # Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile, pe cele trei distante
 for i in range(3):
     mask, text = return_mask_and_text_from_distances(featured_data, i, 'Trainer winning % in the last 1000 days')
     featured_data[text] = compute_trainer_win_percent_in_last_days(featured_data, '1000D', mask=mask)
+    featured_data[text] = featured_data.groupby('TrainerID')[text].fillna(method='ffill').fillna(0)
 
 # Calculez procentajul de victorii ale unui antrenor, in ultimele 1000 de zile, pe cele trei piste
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Trainer winning % in the last 1000 days')
     featured_data[text] = compute_trainer_win_percent_in_last_days(featured_data, '1000D', mask=mask)
+    featured_data[text] = featured_data.groupby('TrainerID')[text].fillna(method='ffill').fillna(0)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile
 featured_data['Jockey winning % in the last 1000 days'] = compute_jockey_win_percent_in_last_days(featured_data,
                                                                                                   '1000D')
+featured_data['Jockey winning % in the last 1000 days'] = featured_data.groupby('JockeyId')[
+    'Jockey winning % in the last 1000 days'].fillna(method='ffill').fillna(0)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe cele trei piste, precum si pe piste,
 # dar indiferent de suprafata
 for i in range(5):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
+    featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare suprafata
 for i in [0, 1]:
     mask, text = return_mask_and_text_from_surfaces(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
+    featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare pista
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
+    featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare distanta
 for i in range(3):
     mask, text = return_mask_and_text_from_distances(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
+    featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile, pe cele trei tipuri de distante si pe cele doua tipuri de suprafete
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile, pe cele trei tipuri de distante
+# si pe cele doua tipuri de suprafete
 for i in range(3):
     for j in range(2):
         mask, text = return_mask_and_text_from_distances_and_surfaces(featured_data, i, j,
                                                                       'Jockey winning % in the last 1000 days')
         featured_data[text] = compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
+        featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile
 featured_data[
     'Average Position of a jockey in the last 1000 days'] = compute_jockey_average_final_position_in_last_days(
     featured_data, '1000D')
+featured_data['Average Position of a jockey in the last 1000 days'] = featured_data.groupby('JockeyId')[
+    'Average Position of a jockey in the last 1000 days'].fillna(method='ffill').fillna(0)
 
-# Calculez pozitia finala medie a unui jochei in ultimele 1000 de zile pe cele doua piste, indiferent de suprafata
+# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele doua piste, indiferent de suprafata
 for i in [3, 4]:
     mask, text = return_mask_and_text_from_tracks(featured_data, i,
                                                   'Average Position of a jockey in the last 1000 days')
     featured_data.loc[mask, text] = compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
                                                                                        mask=mask)
+    featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele doua suprafete
 for i in range(2):
@@ -336,6 +376,7 @@ for i in range(2):
                                                     'Average Position of a jockey in the last 1000 days')
     featured_data.loc[mask, text] = compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
                                                                                        mask=mask)
+    featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele 2 piste, inclusiv suprafetele
 for i in range(3):
@@ -343,6 +384,7 @@ for i in range(3):
                                                   'Average Position of a jockey in the last 1000 days')
     featured_data.loc[mask, text] = compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
                                                                                        mask=mask)
+    featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele trei tipuri de distante
 for i in range(3):
@@ -350,6 +392,7 @@ for i in range(3):
                                                      'Average Position of a jockey in the last 1000 days')
     featured_data.loc[mask, text] = compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
                                                                                        mask=mask)
+    featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele trei tipuri de distante si pe cele doua tipuri de suprafata
 for i in range(3):
@@ -358,20 +401,25 @@ for i in range(3):
                                                                       'Average Position of a jockey in the last 1000 days')
         featured_data.loc[mask, text] = compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
                                                                                            mask=mask)
+        featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile
 featured_data['Mean path of a jockey in the last 1000 days'] = \
     compute_jockey_mean_path_in_last_days(featured_data, '1000D')
+featured_data['Mean path of a jockey in the last 1000 days'] = featured_data.groupby('JockeyId')[
+    'Mean path of a jockey in the last 1000 days'].fillna(method='ffill').fillna(0)
 
 # Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile, in functie de suprafata
 for i in range(2):
     mask, text = return_mask_and_text_from_distances(featured_data, i, 'Mean path of a jockey in the last 1000 days')
     featured_data.loc[mask, text] = compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
+    featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile, in functie de pista si suprafata
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Mean path of a jockey in the last 1000 days')
     featured_data.loc[mask, text] = compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
+    featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile, in functie de suprafata si distanta
 for i in range(3):
@@ -379,9 +427,11 @@ for i in range(3):
         mask, text = return_mask_and_text_from_distances_and_surfaces(featured_data, i, j,
                                                                       'Mean path of a jockey in the last 1000 days')
         featured_data.loc[mask, text] = compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
+        featured_data[text] = featured_data.groupby('JockeyId')[text].fillna(method='ffill').fillna(0)
 
 # Calculez procentajul de victorii ale unui cal
 featured_data['Horse winning %'] = compute_horse_win_percentage(featured_data)
+featured_data['Horse winning %'] = featured_data.groupby('HorseId')['Horse winning %'].fillna(method='ffill').fillna(0)
 
 featured_data = featured_data.drop(columns='cumsum')
 featured_data = featured_data.drop(columns='Win')
