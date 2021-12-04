@@ -185,13 +185,28 @@ featured_data['Last Plassering'] = compute_last_final_position(featured_data)
 featured_data['Last Plassering'] = featured_data.groupby('HorseId')['Last Plassering'].apply(
     lambda x: x.fillna(method='ffill').fillna(0))
 
+
 # Calculez Last FGrating pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
 # pentru fiecare cal
+
+def fill(sdf, track):
+    mask = sdf[['Track']].eq(track).cummax()['Track']
+    if mask.any():
+        first = mask.idxmax()
+        if pd.isna(sdf.at[first, track]):
+            sdf.loc[~mask, track] = 0
+            sdf.at[first, track] = 0
+    sdf[track] = (sdf[track].fillna(method='bfill'))
+    return sdf
+
 
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Last FGrating')
     featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
+    featured_data[text] = (featured_data.groupby('HorseId').apply(fill, text)[text])
+# idx = [ser.index[0] for _, ser in featured_data.groupby('HorseId')[text] if pd.isna(ser.iat[0])]
+# featured_data.loc[idx, text] = 0
+# featured_data[text] = featured_data[text].fillna(method='bfill')
 
 # Calculez pozitia finala pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
 # pentru fiecare cal
