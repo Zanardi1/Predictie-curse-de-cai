@@ -1,13 +1,5 @@
 import pandas as pd
 
-distances_list = [1000, 1200, 1400, 1600, 1650, 1800, 2000, 2200, 2400]
-
-raw_data = pd.read_excel('Data.xlsx')
-print(raw_data.shape)
-print(raw_data.head())
-
-featured_data = raw_data.copy()
-
 
 def compute_last_fgrating(data, mask=''):
     if len(mask) == 0:
@@ -175,6 +167,34 @@ def return_mask_and_text_from_distances_and_surfaces(data, distance, surface_typ
     return mask, text
 
 
+def fill(df, column_name):
+    non_nan_value_list = df[~df[column_name].isnull()]
+    idx = pd.Index(df.index)
+    first_index = non_nan_value_list.index.tolist()[0] if len(non_nan_value_list) > 0 else idx.min()
+    value_to_replace = 0
+    if len(non_nan_value_list) == 0:
+        df[column_name] = 0
+    for i in range(idx.min(), first_index):
+        df[column_name].iloc[i - idx.min()] = 0
+    for i in range(first_index, idx.max() + 1):
+        if pd.isnull(df[column_name].iloc[i - idx.min()]):
+            df[column_name].iloc[i - idx.min()] = value_to_replace
+        else:
+            value_to_replace = df['FGrating'].iloc[i - idx.min()]
+    df = df.drop(columns=['FGrating', 'HorseId'])
+    return df
+
+
+distances_list = [1000, 1200, 1400, 1600, 1650, 1800, 2000, 2200, 2400]
+
+raw_data = pd.read_excel('Data.xlsx')
+print(raw_data.shape)
+print(raw_data.head())
+
+featured_data = raw_data.copy()
+
+all_horse_ids = featured_data['HorseId'].unique()
+
 # Calculez Last FGrating pentru fiecare cal
 featured_data['Last FGrating'] = compute_last_fgrating(featured_data)
 featured_data['Last FGrating'] = featured_data.groupby('HorseId')['Last FGrating'].apply(
@@ -185,28 +205,16 @@ featured_data['Last Plassering'] = compute_last_final_position(featured_data)
 featured_data['Last Plassering'] = featured_data.groupby('HorseId')['Last Plassering'].apply(
     lambda x: x.fillna(method='ffill').fillna(0))
 
-
 # Calculez Last FGrating pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
 # pentru fiecare cal
-
-def fill(sdf, track):
-    mask = sdf[['Track']].eq(track).cummax()['Track']
-    if mask.any():
-        first = mask.idxmax()
-        if pd.isna(sdf.at[first, track]):
-            sdf.loc[~mask, track] = 0
-            sdf.at[first, track] = 0
-    sdf[track] = (sdf[track].fillna(method='bfill'))
-    return sdf
-
 
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Last FGrating')
     featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
-    featured_data[text] = (featured_data.groupby('HorseId').apply(fill, text)[text])
-# idx = [ser.index[0] for _, ser in featured_data.groupby('HorseId')[text] if pd.isna(ser.iat[0])]
-# featured_data.loc[idx, text] = 0
-# featured_data[text] = featured_data[text].fillna(method='bfill')
+    for horse_id in all_horse_ids:
+        temp = featured_data.loc[featured_data.HorseId == horse_id][['FGrating', 'HorseId', text]]
+        temp = fill(temp, text)
+        featured_data.loc[featured_data.HorseId == horse_id, text] = temp
 
 # Calculez pozitia finala pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
 # pentru fiecare cal
