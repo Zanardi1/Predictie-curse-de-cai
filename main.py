@@ -173,12 +173,12 @@ def fill(df, column_name):
     first_index = non_nan_value_list.index.tolist()[0] if len(non_nan_value_list) > 0 else idx.min()
     value_to_replace = 0
     if len(non_nan_value_list) == 0:
-        df[column_name] = 0
+        df[column_name].iloc[:] = 0
     for i in range(idx.min(), first_index):
-        df[column_name].iloc[i - idx.min()] = 0
+        df.loc[i, column_name] = 0
     for i in range(first_index, idx.max() + 1):
-        if pd.isnull(df[column_name].iloc[i - idx.min()]):
-            df[column_name].iloc[i - idx.min()] = value_to_replace
+        if pd.isnull(df.loc[i, column_name]):
+            df.loc[i, column_name] = value_to_replace
         else:
             value_to_replace = df['FGrating'].iloc[i - idx.min()]
     df = df.drop(columns=['FGrating', 'HorseId'])
