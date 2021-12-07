@@ -99,16 +99,16 @@ def compute_horse_win_percentage(data):
 def return_mask_and_text_from_tracks(data, track_no, metric):
     if track_no == 0:  # Sha Tin - iarba
         mask = (data.Track == 'Sha Tin') & (data.Surface == 'Gress')
-        text = str(metric) + ' at Sha-Tin Grass'
+        text = str(metric) + ' at Sha Tin Grass'
     if track_no == 1:  # Sha Tin - pamant
         mask = (data.Track == 'Sha Tin') & (data.Surface == 'Dirt')
-        text = str(metric) + ' at Sha-Tin Dirt'
+        text = str(metric) + ' at Sha Tin Dirt'
     if track_no == 2:  # Happy Valley - iarba
         mask = (data.Track == 'Happy Valley') & (data.Surface == 'Gress')
         text = str(metric) + ' at Happy Valley Grass'
     if track_no == 3:  # Sha Tin, indiferent de suprafata
         mask = data.Track == 'Sha Tin'
-        text = str(metric) + ' at Sha-Tin'
+        text = str(metric) + ' at Sha Tin'
     if track_no == 4:  # Happy Valley, indiferent de suprafata
         mask = data.Track == 'Happy Valley'
         text = str(metric) + ' at Happy Valley'
@@ -167,21 +167,34 @@ def return_mask_and_text_from_distances_and_surfaces(data, distance, surface_typ
     return mask, text
 
 
-def fill(df, column_name):
-    non_nan_value_list = df[~df[column_name].isnull()]
-    idx = pd.Index(df.index)
-    first_index = non_nan_value_list.index.tolist()[0] if len(non_nan_value_list) > 0 else idx.min()
+def return_track_and_surface_from_text(text):
+    if 'Sha Tin' in text:
+        track = 'Sha Tin'
+    else:
+        track = 'Happy Valley'
+    if 'Grass' in text:
+        surface = 'Gress'
+    else:
+        surface = 'Dirt'
+    return track, surface
+
+
+def fill_na_s(df, column_name):
+    race_track, race_surface = return_track_and_surface_from_text(column_name)
+    if len(temp.index) > 1:
+        a = df[['Track', 'Surface']].loc[(temp.Track == race_track) & (temp.Surface == race_surface)]
+        first_race_index = a.index[0] if len(a.index) > 0 else df[['Track', 'Surface']].index.max()
+    else:
+        first_race_index = df[['Track', 'Surface']].index.min()
     value_to_replace = 0
-    if len(non_nan_value_list) == 0:
-        df[column_name].iloc[:] = 0
-    for i in range(idx.min(), first_index):
+    for i in range(df[['Track', 'Surface']].index.min(), first_race_index + 1):
         df.loc[i, column_name] = 0
-    for i in range(first_index, idx.max() + 1):
+    for i in range(first_race_index, df[['Track', 'Surface']].index.max() + 1):
         if pd.isnull(df.loc[i, column_name]):
             df.loc[i, column_name] = value_to_replace
         else:
-            value_to_replace = df['FGrating'].iloc[i - idx.min()]
-    df = df.drop(columns=['FGrating', 'HorseId'])
+            value_to_replace = df['FGrating'].iloc[i - df[['Track', 'Surface']].index.min()]
+    df = df.drop(columns=['FGrating', 'HorseId', 'Track', 'Surface'])
     return df
 
 
@@ -193,7 +206,7 @@ print(raw_data.head())
 
 featured_data = raw_data.copy()
 
-all_horse_ids = featured_data['HorseId'].unique()
+horse_ids_list = featured_data['HorseId'].unique()
 
 # Calculez Last FGrating pentru fiecare cal
 featured_data['Last FGrating'] = compute_last_fgrating(featured_data)
@@ -211,9 +224,9 @@ featured_data['Last Plassering'] = featured_data.groupby('HorseId')['Last Plasse
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Last FGrating')
     featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
-    for horse_id in all_horse_ids:
-        temp = featured_data.loc[featured_data.HorseId == horse_id][['FGrating', 'HorseId', text]]
-        temp = fill(temp, text)
+    for horse_id in horse_ids_list:
+        temp = featured_data.loc[featured_data.HorseId == horse_id][['Track', 'Surface', 'FGrating', 'HorseId', text]]
+        temp = fill_na_s(temp, text)
         featured_data.loc[featured_data.HorseId == horse_id, text] = temp
 
 # Calculez pozitia finala pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
