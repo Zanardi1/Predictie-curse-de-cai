@@ -96,6 +96,62 @@ def compute_horse_win_percentage(data):
     return s
 
 
+def return_columns_that_will_be_used(what_for, column_to_fill, text):
+    columns = []
+    if what_for == 'Tracks':
+        columns = ['Track', 'Surface', column_to_fill, 'HorseId', text]
+    elif what_for == 'Distances':
+        columns = ['Distance', column_to_fill, 'HorseId', text]
+    return columns
+
+
+def filling_na_s_engine(what_for, text, column_to_fill):
+    columns = return_columns_that_will_be_used(what_for, column_to_fill, text)
+    for horse_id in horse_ids_list:
+        data_to_be_processed = featured_data.loc[featured_data.HorseId == horse_id][columns]
+        featured_data.loc[featured_data.HorseId == horse_id, text] = fill_na_s(data_to_be_processed, text, what_for,
+                                                                               column_to_fill)
+
+
+def compute_last_fgratings_on_tracks():
+    for i in range(3):
+        mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Last FGrating')
+        featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
+        filling_na_s_engine('Tracks', text, 'FGrating')
+
+
+def compute_last_fgratings_on_distances():
+    for distance in distances_list:
+        mask, text = return_mask_and_text_from_distances(featured_data, distance, 'Last FGrating')
+        featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
+        filling_na_s_engine('Distances', text, 'FGrating')
+
+
+def compute_last_fgratings_with_conditions():
+    compute_last_fgratings_on_tracks()
+    compute_last_fgratings_on_distances()
+
+
+def compute_last_final_positions_on_tracks():
+    for i in range(3):
+        mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Final Position')
+        featured_data[text] = compute_last_final_position(featured_data, mask=mask)
+        filling_na_s_engine('Tracks', text, 'Plassering')
+
+
+def compute_last_final_positions_on_distances():
+    for distance in distances_list:
+        mask = featured_data.Distance == distance
+        text = 'Last Final Position at ' + str(distance) + ' m'
+        featured_data[text] = compute_last_final_position(featured_data, mask=mask)
+        filling_na_s_engine('Distances', text, 'Plassering')
+
+
+def compute_last_final_positions_with_conditions():
+    compute_last_final_positions_on_tracks()
+    compute_last_final_positions_on_distances()
+
+
 def return_mask_and_text_from_tracks(data, track_no, metric):
     if track_no == 0:  # Sha Tin - iarba
         mask = (data.Track == 'Sha Tin') & (data.Surface == 'Gress')
@@ -115,7 +171,7 @@ def return_mask_and_text_from_tracks(data, track_no, metric):
     return mask, text
 
 
-def return_mask_and_text_from_distances(data, distance_type, metric):
+def return_mask_and_text_from_distance_types(data, distance_type, metric):
     if distance_type == 0:  # Distante de sprint
         mask = (data.Distance == 1000) | (data.Distance == 1200)
         text = str(metric) + ' at sprint distances'
@@ -125,6 +181,12 @@ def return_mask_and_text_from_distances(data, distance_type, metric):
     if distance_type == 2:  # Distante lungi
         mask = (data.Distance == 2000) | (data.Distance == 2200) | (data.Distance == 2400)
         text = str(metric) + ' at long distances'
+    return mask, text
+
+
+def return_mask_and_text_from_distances(data, distance, metric):
+    mask = data.Distance == distance
+    text = str(metric) + ' at ' + str(distance) + ' m'
     return mask, text
 
 
@@ -179,26 +241,43 @@ def return_track_and_surface_from_text(text):
     return track, surface
 
 
-def fill_na_s(df, column_name):
-    race_track, race_surface = return_track_and_surface_from_text(column_name)
-    if len(temp.index) > 1:
-        a = df[['Track', 'Surface']].loc[(temp.Track == race_track) & (temp.Surface == race_surface)]
-        first_race_index = a.index[0] if len(a.index) > 0 else df[['Track', 'Surface']].index.max()
+def return_distance_from_text(text):
+    for distance in distances_list:
+        if str(distance) in text:
+            return distance
+
+
+def fill_na_s(df, column_name, what_for, column_to_fill):
+    if what_for == 'Tracks':
+        race_track, race_surface = return_track_and_surface_from_text(column_name)
+        work_columns = ['Track', 'Surface']
+        mask = (df.Track == race_track) & (df.Surface == race_surface)
+    elif what_for == 'Distances':
+        distance = return_distance_from_text(column_name)
+        work_columns = ['Distance']
+        mask = (df.Distance == distance)
     else:
-        first_race_index = df[['Track', 'Surface']].index.min()
+        print('Eroare')
+        return None
+
+    if len(df[work_columns].index) > 1:
+        set_track_and_surface_data = df[work_columns].loc[mask]
+        first_race_index = set_track_and_surface_data.index[0] if len(set_track_and_surface_data.index) > 0 else df[
+            work_columns].index.max()
+    else:
+        first_race_index = df[work_columns].index.min()
     value_to_replace = 0
-    for i in range(df[['Track', 'Surface']].index.min(), first_race_index + 1):
+    for i in range(df[work_columns].index.min(), first_race_index + 1):
         df.loc[i, column_name] = 0
-    for i in range(first_race_index, df[['Track', 'Surface']].index.max() + 1):
+    for i in range(first_race_index, df[work_columns].index.max() + 1):
         if pd.isnull(df.loc[i, column_name]):
             df.loc[i, column_name] = value_to_replace
         else:
-            value_to_replace = df['FGrating'].iloc[i - df[['Track', 'Surface']].index.min()]
-    df = df.drop(columns=['FGrating', 'HorseId', 'Track', 'Surface'])
+            value_to_replace = df.loc[i, column_to_fill]
+            # value_to_replace = df.loc[df[work_columns].index.min(), column_to_fill]
+    df = df.drop(columns=[column_to_fill, 'HorseId'] + work_columns)
     return df
 
-
-distances_list = [1000, 1200, 1400, 1600, 1650, 1800, 2000, 2200, 2400]
 
 raw_data = pd.read_excel('Data.xlsx')
 print(raw_data.shape)
@@ -207,6 +286,7 @@ print(raw_data.head())
 featured_data = raw_data.copy()
 
 horse_ids_list = featured_data['HorseId'].unique()
+distances_list = featured_data['Distance'].unique()
 
 # Calculez Last FGrating pentru fiecare cal
 featured_data['Last FGrating'] = compute_last_fgrating(featured_data)
@@ -218,38 +298,11 @@ featured_data['Last Plassering'] = compute_last_final_position(featured_data)
 featured_data['Last Plassering'] = featured_data.groupby('HorseId')['Last Plassering'].apply(
     lambda x: x.fillna(method='ffill').fillna(0))
 
-# Calculez Last FGrating pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
-# pentru fiecare cal
+# Calculez Last FGrating pentru cele trei piste, respectiv pentru fiecare distanta, ambele pentru fiecare cal
+compute_last_fgratings_with_conditions()
 
-for i in range(3):
-    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Last FGrating')
-    featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
-    for horse_id in horse_ids_list:
-        temp = featured_data.loc[featured_data.HorseId == horse_id][['Track', 'Surface', 'FGrating', 'HorseId', text]]
-        temp = fill_na_s(temp, text)
-        featured_data.loc[featured_data.HorseId == horse_id, text] = temp
-
-# Calculez pozitia finala pentru fiecare dintre cele trei piste: Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
-# pentru fiecare cal
-
-for i in range(3):
-    mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Final Position')
-    featured_data[text] = compute_last_final_position(featured_data, mask=mask)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
-
-# Calculez Last FGrating pentru fiecare distanta pentru fiecare cal
-for distance in distances_list:
-    mask = featured_data.Distance == distance
-    text = 'Last FGRating at ' + str(distance) + ' m'
-    featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
-
-# Calculez ultima pozitie finala pentru fiecare distanta pentru fiecare cal
-for distance in distances_list:
-    mask = featured_data.Distance == distance
-    text = 'Last Final Position at ' + str(distance) + ' m'
-    featured_data[text] = compute_last_final_position(featured_data, mask=mask)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
+# Calculez pozitia finala pentru cele trei piste, respectiv pentru fiecare distanta, ambele pentru fiecare cal
+compute_last_final_positions_with_conditions()
 
 # Calculez FGrating mediu total al fiecarui cal
 featured_data['Average FGrating'] = compute_average_fg_rating(featured_data)
