@@ -279,6 +279,11 @@ def fill_na_s(df, column_name, what_for, column_to_fill):
     return df
 
 
+def fill_for_all(df, column):
+    result = df.groupby('HorseId')[column].fillna(method='ffill').fillna(0)
+    return result
+
+
 raw_data = pd.read_excel('Data.xlsx')
 print(raw_data.shape)
 print(raw_data.head())
@@ -290,13 +295,11 @@ distances_list = featured_data['Distance'].unique()
 
 # Calculez Last FGrating pentru fiecare cal
 featured_data['Last FGrating'] = compute_last_fgrating(featured_data)
-featured_data['Last FGrating'] = featured_data.groupby('HorseId')['Last FGrating'].apply(
-    lambda x: x.fillna(method='ffill').fillna(0))
+featured_data['Last FGrating'] = fill_for_all(featured_data, 'Last FGrating')
 
 # Calculez Last Final Position pentru fiecare cal
 featured_data['Last Plassering'] = compute_last_final_position(featured_data)
-featured_data['Last Plassering'] = featured_data.groupby('HorseId')['Last Plassering'].apply(
-    lambda x: x.fillna(method='ffill').fillna(0))
+featured_data['Last Plassering'] = fill_for_all(featured_data, 'Last Plassering')
 
 # Calculez Last FGrating pentru cele trei piste, respectiv pentru fiecare distanta, ambele pentru fiecare cal
 compute_last_fgratings_with_conditions()
@@ -306,25 +309,23 @@ compute_last_final_positions_with_conditions()
 
 # Calculez FGrating mediu total al fiecarui cal
 featured_data['Average FGrating'] = compute_average_fg_rating(featured_data)
-featured_data['Average FGrating'] = featured_data.groupby('HorseId')['Average FGrating'].fillna(method='ffill').fillna(
-    0)
+featured_data['Average FGrating'] = fill_for_all(featured_data, 'Average FGrating')
 
 # Calculez pozitia medie totala pe fiecare cal
 featured_data['Average Position'] = compute_average_position(featured_data)
-featured_data['Average Position'] = featured_data.groupby('HorseId')['Average Position'].fillna(method='ffill').fillna(
-    0)
+featured_data['Average Position'] = fill_for_all(featured_data, 'Average Position')
 
 # Calculez FGrating mediu in ultimele 10, respectiv 4 starturi pentru fiecare cal
 for i in [10, 4]:
     text = 'Average FGrating in the last ' + str(i) + ' starts'
     featured_data[text] = compute_average_fgrating_in_last_starts(featured_data, i)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
+    featured_data[text] = fill_for_all(featured_data, text)
 
 # Calculez pozitia finala medie in ultimele 10, respectiv 4 starturi pentru fiecare cal
 for i in [10, 4]:
     text = 'Average Position in the last ' + str(i) + 'starts'
     featured_data[text] = compute_average_position_in_last_starts(featured_data, i)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
+    featured_data[text] = fill_for_all(featured_data, text)
 
 # Calculez FGrating mediu pentru fiecare dintre cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
 # pentru fiecare cal
@@ -332,7 +333,7 @@ for i in [10, 4]:
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Average FGrating')
     featured_data[text] = compute_average_fg_rating(featured_data, mask=mask)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
+    featured_data[text] = fill_for_all(featured_data, text)
 
 # Calculez pozitia medie pentru fiecare dinte cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
 # pentru fiecare cal
@@ -340,36 +341,35 @@ for i in range(3):
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Average Position')
     featured_data[text] = compute_average_position(featured_data, mask=mask)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
+    featured_data[text] = fill_for_all(featured_data, text)
 
 # Calculez FGrating mediu pentru cele trei tipuri de distante pentru fiecare cal
 for i in range(3):
     mask, text = return_mask_and_text_from_distances(featured_data, i, 'Average FGrating')
     featured_data[text] = compute_average_fg_rating(featured_data, mask=mask)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
+    featured_data[text] = fill_for_all(featured_data, text)
 
 # Calculez pozitia medie pentru cele trei tipuri de distante pentru fiecare cal
 for i in range(3):
     mask, text = return_mask_and_text_from_distances(featured_data, i, 'Average Position')
     featured_data[text] = compute_average_position(featured_data, mask=mask)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
+    featured_data[text] = fill_for_all(featured_data, text)
 
 # Calculez FGrating maxim pentru fiecare cal
 featured_data['Maximum FGrating'] = compute_max_fg_rating(featured_data)
-featured_data['Maximum FGrating'] = featured_data.groupby('HorseId')['Maximum FGrating'].fillna(method='ffill').fillna(
-    0)
+featured_data['Maximum FGrating'] = fill_for_all(featured_data, text)
 
 # Calculez FGrating maxim pentru cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass, pentru fiecare cal
 for i in range(3):
     mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Maximum FGrating')
     featured_data[text] = compute_max_fg_rating(featured_data, mask=mask)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
+    featured_data[text] = fill_for_all(featured_data, text)
 
 # Calculez FGrating maxim pentru cele trei tipuri de distante, pentru fiecare cal
 for i in range(3):
     mask, text = return_mask_and_text_from_distances(featured_data, i, 'Maximum FGrating')
     featured_data[text] = compute_max_fg_rating(featured_data, mask=mask)
-    featured_data[text] = featured_data.groupby('HorseId')[text].apply(lambda x: x.fillna(method='ffill').fillna(0))
+    featured_data[text] = fill_for_all(featured_data, text)
 
 # Calculez FGrating maxim pentru fiecare cal din ultimele trei starturi
 featured_data['Maximum FGrating in last 3 starts'] = featured_data.groupby('HorseId')['FGrating'].apply(
