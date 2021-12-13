@@ -51,23 +51,21 @@ def compute_max_fg_rating(df, mask=''):
 def compute_trainer_win_percent_in_last_days(df, no_days, mask=''):
     df['Win'] = df['Plassering'].eq(1)
     if len(mask) == 0:
-        s = (df.reset_index().groupby('TrainerID').rolling(no_days, on='Dato').agg(
+        return (df.reset_index().groupby('TrainerID').rolling(no_days, on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
     else:
-        s = (df.loc[mask].reset_index().groupby('TrainerID').rolling(no_days, on='Dato').agg(
+        return (df.loc[mask].reset_index().groupby('TrainerID').rolling(no_days, on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
-    return s
 
 
 def compute_jockey_win_percent_in_last_days(df, no_days, mask=''):
     df['Win'] = df['Plassering'].eq(1)
     if len(mask) == 0:
-        s = (df.reset_index().groupby('JockeyId').rolling(no_days, on='Dato').agg(
+        return (df.reset_index().groupby('JockeyId').rolling(no_days, on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
     else:
-        s = (df.loc[mask].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        return (df.loc[mask].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
-    return s
 
 
 def compute_jockey_average_final_position_in_last_days(df, no_days, mask=''):
@@ -90,9 +88,8 @@ def compute_jockey_mean_path_in_last_days(df, no_days, mask=''):
 
 def compute_horse_win_percentage(df):
     df['Win'] = df['Plassering'].eq(1)
-    s = (df.reset_index().groupby('HorseId').rolling('1000D', on='Dato').agg(
+    return (df.reset_index().groupby('HorseId').rolling('1000D', on='Dato').agg(
         {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
-    return s
 
 
 def return_columns_that_will_be_used(what_for, column_to_fill, text):
