@@ -104,51 +104,52 @@ def return_columns_that_will_be_used(what_for, column_to_fill, text):
     return columns
 
 
-def filling_na_s_engine(what_for, text, column_to_fill):
+def filling_na_s_engine(df, what_for, text, column_to_fill):
     columns = return_columns_that_will_be_used(what_for, column_to_fill, text)
     for horse_id in horse_ids_list:
-        data_to_be_processed = featured_data.loc[featured_data.HorseId == horse_id][columns]
-        featured_data.loc[featured_data.HorseId == horse_id, text] = fill_na_s(data_to_be_processed, text, what_for,
-                                                                               column_to_fill)
+        data_to_be_processed = df.loc[featured_data.HorseId == horse_id][columns]
+        df.loc[df.HorseId == horse_id, text] = fill_na_s(data_to_be_processed, text, what_for,
+                                                         column_to_fill)
+        return df.loc[df.HorseId == horse_id, text]
 
 
-def compute_last_fgratings_on_tracks():
+def compute_last_fgratings_on_tracks(df):
     for i in range(3):
-        mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Last FGrating')
-        featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
-        filling_na_s_engine('Tracks', text, 'FGrating')
+        mask, text = return_mask_and_text_from_tracks(df, i, 'Last FGrating')
+        df[text] = compute_last_fgrating(df, mask=mask)
+        df[text] = filling_na_s_engine(df, 'Tracks', text, 'FGrating')
 
 
-def compute_last_fgratings_on_distances():
+def compute_last_fgratings_on_distances(df):
     for distance in distances_list:
-        mask, text = return_mask_and_text_from_distances(featured_data, distance, 'Last FGrating')
-        featured_data[text] = compute_last_fgrating(featured_data, mask=mask)
-        filling_na_s_engine('Distances', text, 'FGrating')
+        mask, text = return_mask_and_text_from_distances(df, distance, 'Last FGrating')
+        df[text] = compute_last_fgrating(df, mask=mask)
+        df[text] = filling_na_s_engine(df, 'Distances', text, 'FGrating')
 
 
-def compute_last_fgratings_with_conditions():
-    compute_last_fgratings_on_tracks()
-    compute_last_fgratings_on_distances()
+def compute_last_fgratings_with_conditions(df):
+    compute_last_fgratings_on_tracks(df)
+    compute_last_fgratings_on_distances(df)
 
 
-def compute_last_final_positions_on_tracks():
+def compute_last_final_positions_on_tracks(df):
     for i in range(3):
-        mask, text = return_mask_and_text_from_tracks(featured_data, i, 'Final Position')
-        featured_data[text] = compute_last_final_position(featured_data, mask=mask)
-        filling_na_s_engine('Tracks', text, 'Plassering')
+        mask, text = return_mask_and_text_from_tracks(df, i, 'Final Position')
+        df[text] = compute_last_final_position(df, mask=mask)
+        df[text] = filling_na_s_engine(df, 'Tracks', text, 'Plassering')
 
 
-def compute_last_final_positions_on_distances():
+def compute_last_final_positions_on_distances(df):
     for distance in distances_list:
-        mask = featured_data.Distance == distance
+        mask = df.Distance == distance
         text = 'Last Final Position at ' + str(distance) + ' m'
-        featured_data[text] = compute_last_final_position(featured_data, mask=mask)
-        filling_na_s_engine('Distances', text, 'Plassering')
+        df[text] = compute_last_final_position(df, mask=mask)
+        df[text] = filling_na_s_engine(df, 'Distances', text, 'Plassering')
 
 
-def compute_last_final_positions_with_conditions():
-    compute_last_final_positions_on_tracks()
-    compute_last_final_positions_on_distances()
+def compute_last_final_positions_with_conditions(df):
+    compute_last_final_positions_on_tracks(df)
+    compute_last_final_positions_on_distances(df)
 
 
 def return_mask_and_text_from_tracks(df, track_no, metric):
@@ -273,7 +274,6 @@ def fill_na_s(df, column_name, what_for, column_to_fill):
             df.loc[i, column_name] = value_to_replace
         else:
             value_to_replace = df.loc[i, column_to_fill]
-            # value_to_replace = df.loc[df[work_columns].index.min(), column_to_fill]
     df = df.drop(columns=[column_to_fill, 'HorseId'] + work_columns)
     return df
 
@@ -301,10 +301,10 @@ featured_data['Last Plassering'] = compute_last_final_position(featured_data)
 featured_data['Last Plassering'] = fill_for_all(featured_data, 'Last Plassering', 'HorseId')
 
 # Calculez Last FGrating pentru cele trei piste, respectiv pentru fiecare distanta, ambele pentru fiecare cal
-compute_last_fgratings_with_conditions()
+compute_last_fgratings_with_conditions(featured_data)
 
 # Calculez pozitia finala pentru cele trei piste, respectiv pentru fiecare distanta, ambele pentru fiecare cal
-compute_last_final_positions_with_conditions()
+compute_last_final_positions_with_conditions(featured_data)
 
 # Calculez FGrating mediu total al fiecarui cal
 featured_data['Average FGrating'] = compute_average_fg_rating(featured_data)
