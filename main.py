@@ -2,15 +2,15 @@ import computing as c
 import filling as f
 import pandas as pd
 import returning as r
+import datetime
+
+start = datetime.datetime.now()
 
 raw_data = pd.read_excel('Data.xlsx')
 print(raw_data.shape)
 print(raw_data.head())
 
 featured_data = raw_data.copy()
-
-horse_ids_list = featured_data['HorseId'].unique()
-distances_list = featured_data['Distance'].unique()
 
 # Calculez Last FGrating pentru fiecare cal
 featured_data['Last FGrating'] = c.compute_last_fgrating(featured_data)
@@ -249,3 +249,6 @@ featured_data = featured_data.sort_values(by=['Dato', 'Løpsnr', 'Plassering'])
 featured_data.to_excel('Date sortate.xlsx')
 featured_data = pd.DataFrame()
 del featured_data
+
+stop = datetime.datetime.now()
+print(stop - start)
