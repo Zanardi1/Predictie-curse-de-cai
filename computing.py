@@ -5,42 +5,41 @@ import returning as r
 
 def compute_last_fgrating(df, mask=''):
     if len(mask) == 0:
-        return df.groupby('HorseId')['FGrating'].apply(lambda x: x.shift(1))
+        return df.groupby('HorseId')['FGrating'].shift(1)
     else:
-        return df.loc[mask][['HorseId', 'FGrating']].groupby('HorseId')['FGrating'].apply(
-            lambda x: x.shift(1))
+        return df.loc[mask][['HorseId', 'FGrating']].groupby('HorseId')['FGrating'].shift(1)
 
 
 def compute_last_final_position(df, mask=''):
     if len(mask) == 0:
-        return df.groupby('HorseId')['Plassering'].apply(lambda x: x.shift(1))
+        return df.groupby('HorseId')['Plassering'].shift(1)
     else:
-        return df.loc[mask][['HorseId', 'Plassering']].groupby('HorseId')['Plassering'].apply(lambda x: x.shift(1))
+        return df.loc[mask][['HorseId', 'Plassering']].groupby('HorseId')['Plassering'].shift(1)
 
 
 def compute_average_fgrating_in_last_starts(df, no_starts):
-    return df.groupby('HorseId')['FGrating'].apply(lambda x: x.shift().expanding(min_periods=no_starts).mean())
+    return df.groupby('HorseId')['FGrating'].shift().expanding(min_periods=no_starts).mean()
 
 
 def compute_average_position_in_last_starts(df, no_starts):
-    return df.groupby('HorseId')['Plassering'].apply(lambda x: x.shift().expanding(min_periods=no_starts).mean())
+    return df.groupby('HorseId')['Plassering'].shift().expanding(min_periods=no_starts).mean()
 
 
 def compute_average_fg_rating(df, mask=''):
     if len(mask) == 0:
-        df['cumsum'] = df.groupby('HorseId')['FGrating'].apply(lambda p: p.shift(fill_value=0).cumsum())
+        df['cumsum'] = df.groupby('HorseId')['FGrating'].shift(fill_value=0).cumsum()
         return df['cumsum'] / df.groupby('HorseId')['FGrating'].cumcount()
     else:
-        return df.loc[mask].groupby('HorseId')['FGrating'].apply(lambda x: x.shift().expanding().mean())
+        return df.loc[mask].groupby('HorseId')['FGrating'].shift().expanding().mean()
 
 
 def compute_average_position(df, mask=''):
     if len(mask) == 0:
         temp = df.groupby('HorseId')['Plassering']
-        df['cumsum'] = temp.apply(lambda p: p.shift(fill_value=0).cumsum())
+        df['cumsum'] = temp.shift(fill_value=0).cumsum()
         return df['cumsum'] / temp.cumcount()
     else:
-        return df.loc[mask].groupby('HorseId')['Plassering'].apply(lambda x: x.shift().expanding().mean())
+        return df.loc[mask].groupby('HorseId')['Plassering'].shift().expanding().mean()
 
 
 def compute_max_fg_rating(df, mask=''):
@@ -115,9 +114,11 @@ def compute_last_fgratings_with_conditions(df):
 
 def compute_last_final_positions_on_tracks(df):
     for i in range(3):
-        mask, text = r.return_mask_and_text_from_tracks(df, i, 'Final Position')
+        mask, text = r.return_mask_and_text_from_tracks(df, i, 'Last Final Position at')
         df[text] = compute_last_final_position(df, mask=mask)
         df[text] = f.fill_the_gaps(df, 'Tracks', text, 'Plassering')
+    # TODO : sa mut functia fill_the_gaps in afara functiei compute_last_final_positions_on_tracks, deoarece
+    #  compute_last_final_positions_on_tracks ar executa doua lucruri.
 
 
 def compute_last_final_positions_on_distances(df):
@@ -126,6 +127,8 @@ def compute_last_final_positions_on_distances(df):
         text = 'Last Final Position at ' + str(distance) + ' m'
         df[text] = compute_last_final_position(df, mask=mask)
         df[text] = f.fill_the_gaps(df, 'Distances', text, 'Plassering')
+    # TODO : sa mut functia fill_the_gaps in afara functiei compute_last_final_positions_on_distances, deoarece
+    #  compute_last_final_positions_on_distances ar executa doua lucruri
 
 
 def compute_last_final_positions_with_conditions(df):

@@ -76,7 +76,7 @@ for i in range(3):
 
 # Calculez FGrating maxim pentru fiecare cal
 featured_data['Maximum FGrating'] = c.compute_max_fg_rating(featured_data)
-featured_data['Maximum FGrating'] = f.fill_for_all(featured_data, text, 'HorseId')
+featured_data['Maximum FGrating'] = f.fill_for_all(featured_data, 'Maximum FGrating', 'HorseId')
 
 # Calculez FGrating maxim pentru cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass, pentru fiecare cal
 for i in range(3):
