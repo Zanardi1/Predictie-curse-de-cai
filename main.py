@@ -64,13 +64,13 @@ for i in range(3):
 
 # Calculez FGrating mediu pentru cele trei tipuri de distante pentru fiecare cal
 for i in range(3):
-    mask, text = r.return_mask_and_text_from_distances(featured_data, i, 'Average FGrating')
+    mask, text = r.return_mask_and_text_from_distance_types(featured_data, i, 'Average FGrating')
     featured_data[text] = c.compute_average_fg_rating(featured_data, mask=mask)
     featured_data[text] = f.fill_for_all(featured_data, text, 'HorseId')
 
 # Calculez pozitia medie pentru cele trei tipuri de distante pentru fiecare cal
 for i in range(3):
-    mask, text = r.return_mask_and_text_from_distances(featured_data, i, 'Average Position')
+    mask, text = r.return_mask_and_text_from_distance_types(featured_data, i, 'Average Position')
     featured_data[text] = c.compute_average_position(featured_data, mask=mask)
     featured_data[text] = f.fill_for_all(featured_data, text, 'HorseId')
 
@@ -86,7 +86,7 @@ for i in range(3):
 
 # Calculez FGrating maxim pentru cele trei tipuri de distante, pentru fiecare cal
 for i in range(3):
-    mask, text = r.return_mask_and_text_from_distances(featured_data, i, 'Maximum FGrating')
+    mask, text = r.return_mask_and_text_from_distance_types(featured_data, i, 'Maximum FGrating')
     featured_data[text] = c.compute_max_fg_rating(featured_data, mask=mask)
     featured_data[text] = f.fill_for_all(featured_data, text, 'HorseId')
 
@@ -111,9 +111,9 @@ for i in [1000, 90, 30]:
     featured_data[text] = c.compute_trainer_win_percent_in_last_days(featured_data, time_length)
     featured_data[text] = f.fill_for_all(featured_data, text, 'TrainerID')
 
-# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile, pe cele trei distante
+# Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile, pe cele trei tipuri de distante
 for i in range(3):
-    mask, text = r.return_mask_and_text_from_distances(featured_data, i, 'Trainer winning % in the last 1000 days')
+    mask, text = r.return_mask_and_text_from_distance_types(featured_data, i, 'Trainer winning % in the last 1000 days')
     featured_data[text] = c.compute_trainer_win_percent_in_last_days(featured_data, '1000D', mask=mask)
     featured_data[text] = f.fill_for_all(featured_data, text, 'TrainerID')
 
@@ -148,9 +148,9 @@ for i in range(3):
     featured_data[text] = c.compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
     featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
 
-# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare distanta
+# Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare tip de distanta
 for i in range(3):
-    mask, text = r.return_mask_and_text_from_distances(featured_data, i, 'Jockey winning % in the last 1000 days')
+    mask, text = r.return_mask_and_text_from_distance_types(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = c.compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
     featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
 
@@ -197,8 +197,8 @@ for i in range(3):
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele trei tipuri de distante
 for i in range(3):
-    mask, text = r.return_mask_and_text_from_distances(featured_data, i,
-                                                       'Average Position of a jockey in the last 1000 days')
+    mask, text = r.return_mask_and_text_from_distance_types(featured_data, i,
+                                                            'Average Position of a jockey in the last 1000 days')
     featured_data.loc[mask, text] = c.compute_jockey_average_final_position_in_last_days(featured_data, '1000D',
                                                                                          mask=mask)
     featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
@@ -221,7 +221,7 @@ featured_data['Mean path of a jockey in the last 1000 days'] = f.fill_for_all(fe
 
 # Calculez calea ('Path') medie a unui jocheu in ultimele 1000 de zile, in functie de suprafata
 for i in range(2):
-    mask, text = r.return_mask_and_text_from_distances(featured_data, i, 'Mean path of a jockey in the last 1000 days')
+    mask, text = r.return_mask_and_text_from_surfaces(featured_data, i, 'Mean path of a jockey in the last 1000 days')
     featured_data.loc[mask, text] = c.compute_jockey_mean_path_in_last_days(featured_data, '1000D', mask=mask)
     featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
 
