@@ -246,9 +246,11 @@ featured_data['Horse winning %'] = featured_data.groupby('HorseId')['Horse winni
 featured_data = featured_data.drop(columns='cumsum')
 featured_data = featured_data.drop(columns='Win')
 featured_data = featured_data.sort_values(by=['Dato', 'Løpsnr', 'Plassering'])
+stop = datetime.datetime.now()
+print(stop - start)
 featured_data.to_excel('Date sortate.xlsx')
 featured_data = pd.DataFrame()
 del featured_data
 
-stop = datetime.datetime.now()
-print(stop - start)
+stop2 = datetime.datetime.now()
+print(stop2 - start)
