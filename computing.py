@@ -98,14 +98,14 @@ def compute_last_fgratings_on_tracks(df):
     for i in range(3):
         mask, text = r.return_mask_and_text_from_tracks(df, i, 'Last FGrating')
         df[text] = compute_last_fgrating(df, mask=mask)
-        df[text] = f.filling_na_s_engine(df, 'Tracks', text, 'FGrating')
+        df[text] = f.fill_the_gaps(df, 'Tracks', text, 'FGrating')
 
 
 def compute_last_fgratings_on_distances(df):
     for distance in df['Distance'].unique():
         mask, text = r.return_mask_and_text_from_distances(df, distance, 'Last FGrating')
         df[text] = compute_last_fgrating(df, mask=mask)
-        df[text] = f.filling_na_s_engine(df, 'Distances', text, 'FGrating')
+        df[text] = f.fill_the_gaps(df, 'Distances', text, 'FGrating')
 
 
 def compute_last_fgratings_with_conditions(df):
@@ -117,7 +117,7 @@ def compute_last_final_positions_on_tracks(df):
     for i in range(3):
         mask, text = r.return_mask_and_text_from_tracks(df, i, 'Final Position')
         df[text] = compute_last_final_position(df, mask=mask)
-        df[text] = f.filling_na_s_engine(df, 'Tracks', text, 'Plassering')
+        df[text] = f.fill_the_gaps(df, 'Tracks', text, 'Plassering')
 
 
 def compute_last_final_positions_on_distances(df):
@@ -125,7 +125,7 @@ def compute_last_final_positions_on_distances(df):
         mask = df.Distance == distance
         text = 'Last Final Position at ' + str(distance) + ' m'
         df[text] = compute_last_final_position(df, mask=mask)
-        df[text] = f.filling_na_s_engine(df, 'Distances', text, 'Plassering')
+        df[text] = f.fill_the_gaps(df, 'Distances', text, 'Plassering')
 
 
 def compute_last_final_positions_with_conditions(df):

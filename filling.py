@@ -2,13 +2,8 @@ import returning as r
 import pandas as pd
 
 
-def filling_na_s_engine(df, what_for, text, column_to_fill):
-    columns = r.return_columns_that_will_be_used(what_for, column_to_fill, text)
-    for horse_id in df['HorseId'].unique():
-        data_to_be_processed = df.loc[df.HorseId == horse_id][columns]
-        df.loc[df.HorseId == horse_id, text] = fill_na_s(data_to_be_processed, text, what_for,
-                                                         column_to_fill)
-        return df.loc[df.HorseId == horse_id, text]
+def fill_preprocessing(df, what_for, text, column_to_fill, columns, horse_id):
+    return df.loc[df.HorseId == horse_id][columns]
 
 
 def fill_na_s(df, column_name, what_for, column_to_fill):
@@ -45,3 +40,11 @@ def fill_na_s(df, column_name, what_for, column_to_fill):
 def fill_for_all(df, column, group_by):
     result = df.groupby(group_by)[column].fillna(method='ffill').fillna(0)
     return result
+
+
+def fill_the_gaps(df, what_for, text, column_to_fill):
+    columns = r.return_columns_that_will_be_used(what_for, column_to_fill, text)
+    for horse_id in df['HorseId'].unique():
+        preprocessed_data = fill_preprocessing(df, what_for, text, column_to_fill, columns, horse_id)
+        df.loc[df.HorseId == horse_id, text] = fill_na_s(preprocessed_data, text, what_for, column_to_fill)
+        return df.loc[df.HorseId == horse_id, text]

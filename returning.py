@@ -89,7 +89,7 @@ def return_track_from_text(text):
 
 
 def return_surface_from_text(text):
-    return 'Gress' if 'Gress' in text else 'Dirt'
+    return 'Gress' if 'Grass' in text else 'Dirt'
 
 
 def return_track_and_surface_from_text(text):
