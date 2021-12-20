@@ -94,17 +94,22 @@ def compute_horse_win_percentage(df):
 
 
 def compute_last_fgratings_on_tracks(df):
+    race_track, race_surface, distance, work_columns, mask = r.return_filling_parameters(
+        df, 'Tracks')
     for i in range(3):
         mask, text = r.return_mask_and_text_from_tracks(df, i, 'Last FGrating')
         df[text] = compute_last_fgrating(df, mask=mask)
-        df[text] = f.fill_the_gaps(df, 'Tracks', text, 'FGrating')
+        df[text] = f.fill_the_gaps(df, 'Tracks', text, 'FGrating', work_columns, mask, race_track=race_track,
+                                   race_surface=race_surface)
 
 
 def compute_last_fgratings_on_distances(df):
+    race_track, race_surface, distance, work_columns, mask = r.return_filling_parameters(
+        df, 'Distances')
     for distance in df['Distance'].unique():
         mask, text = r.return_mask_and_text_from_distances(df, distance, 'Last FGrating')
         df[text] = compute_last_fgrating(df, mask=mask)
-        df[text] = f.fill_the_gaps(df, 'Distances', text, 'FGrating')
+        df[text] = f.fill_the_gaps(df, 'Distances', text, 'FGrating', work_columns, mask, distance=distance)
 
 
 def compute_last_fgratings_with_conditions(df):
@@ -112,21 +117,31 @@ def compute_last_fgratings_with_conditions(df):
     compute_last_fgratings_on_distances(df)
 
 
+def compute_last_fgratings_without_conditions(df):
+    df['Last FGrating'] = compute_last_fgrating(df)
+    df['Last FGrating'] = f.fill_for_all(df, 'Last FGrating', 'HorseId')
+
+
 def compute_last_final_positions_on_tracks(df):
+    race_track, race_surface, distance, work_columns, mask = r.return_filling_parameters(
+        df, 'Tracks')
     for i in range(3):
         mask, text = r.return_mask_and_text_from_tracks(df, i, 'Last Final Position at')
         df[text] = compute_last_final_position(df, mask=mask)
-        df[text] = f.fill_the_gaps(df, 'Tracks', text, 'Plassering')
+        df[text] = f.fill_the_gaps(df, 'Tracks', text, 'Plassering', work_columns, mask, race_track=race_track,
+                                   race_surface=race_surface)
     # TODO : sa mut functia fill_the_gaps in afara functiei compute_last_final_positions_on_tracks, deoarece
     #  compute_last_final_positions_on_tracks ar executa doua lucruri.
 
 
 def compute_last_final_positions_on_distances(df):
+    race_track, race_surface, distance, work_columns, mask = r.return_filling_parameters(
+        df, 'Distances')
     for distance in df['Distance'].unique():
         mask = df.Distance == distance
         text = 'Last Final Position at ' + str(distance) + ' m'
         df[text] = compute_last_final_position(df, mask=mask)
-        df[text] = f.fill_the_gaps(df, 'Distances', text, 'Plassering')
+        df[text] = f.fill_the_gaps(df, 'Distances', text, 'Plassering', work_columns, mask, distance=distance)
     # TODO : sa mut functia fill_the_gaps in afara functiei compute_last_final_positions_on_distances, deoarece
     #  compute_last_final_positions_on_distances ar executa doua lucruri
 
@@ -134,3 +149,28 @@ def compute_last_final_positions_on_distances(df):
 def compute_last_final_positions_with_conditions(df):
     compute_last_final_positions_on_tracks(df)
     compute_last_final_positions_on_distances(df)
+
+
+def compute_last_final_positions_without_conditions(df):
+    df['Last Plassering'] = compute_last_final_position(df)
+    df['Last Plassering'] = f.fill_for_all(df, 'Last Plassering', 'HorseId')
+
+
+def compute_average_fgratings_without_conditions(df, mask='', text='Average FGrating'):
+    df[text] = compute_average_fg_rating(df, mask)
+    df[text] = f.fill_for_all(df, text, 'HorseId')
+
+
+def compute_average_positions_without_conditions(df, mask='', text='Average Position'):
+    df[text] = compute_average_position(df, mask)
+    df[text] = f.fill_for_all(df, text, 'HorseId')
+
+
+def compute_max_fg_ratings_without_conditions(df, mask='', text='Maximum FGrating'):
+    df[text] = compute_max_fg_rating(df, mask)
+    df[text] = f.fill_for_all(df, text, 'HorseId')
+
+
+def compute_trainer_win_percent_without_conditions(df, text, time_length='1000D', mask=''):
+    df[text] = compute_trainer_win_percent_in_last_days(df, time_length)
+    f.fill_for_all(df, text, 'TrainerID')

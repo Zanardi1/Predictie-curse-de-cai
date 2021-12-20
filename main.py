@@ -2,9 +2,6 @@ import computing as c
 import filling as f
 import pandas as pd
 import returning as r
-import datetime
-
-start = datetime.datetime.now()
 
 raw_data = pd.read_excel('Data.xlsx')
 print(raw_data.shape)
@@ -13,12 +10,10 @@ print(raw_data.head())
 featured_data = raw_data.copy()
 
 # Calculez Last FGrating pentru fiecare cal
-featured_data['Last FGrating'] = c.compute_last_fgrating(featured_data)
-featured_data['Last FGrating'] = f.fill_for_all(featured_data, 'Last FGrating', 'HorseId')
+c.compute_last_fgratings_without_conditions(featured_data)
 
 # Calculez Last Final Position pentru fiecare cal
-featured_data['Last Plassering'] = c.compute_last_final_position(featured_data)
-featured_data['Last Plassering'] = f.fill_for_all(featured_data, 'Last Plassering', 'HorseId')
+c.compute_last_final_positions_without_conditions(featured_data)
 
 # Calculez Last FGrating pentru cele trei piste, respectiv pentru fiecare distanta, ambele pentru fiecare cal
 c.compute_last_fgratings_with_conditions(featured_data)
@@ -27,12 +22,10 @@ c.compute_last_fgratings_with_conditions(featured_data)
 c.compute_last_final_positions_with_conditions(featured_data)
 
 # Calculez FGrating mediu total al fiecarui cal
-featured_data['Average FGrating'] = c.compute_average_fg_rating(featured_data)
-featured_data['Average FGrating'] = f.fill_for_all(featured_data, 'Average FGrating', 'HorseId')
+c.compute_average_fgratings_without_conditions(featured_data)
 
 # Calculez pozitia medie totala pe fiecare cal
-featured_data['Average Position'] = c.compute_average_position(featured_data)
-featured_data['Average Position'] = f.fill_for_all(featured_data, 'Average Position', 'HorseId')
+c.compute_average_positions_without_conditions(featured_data)
 
 # Calculez FGrating mediu in ultimele 10, respectiv 4 starturi pentru fiecare cal
 for i in [10, 4]:
@@ -51,44 +44,37 @@ for i in [10, 4]:
 
 for i in range(3):
     mask, text = r.return_mask_and_text_from_tracks(featured_data, i, 'Average FGrating')
-    featured_data[text] = c.compute_average_fg_rating(featured_data, mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'HorseId')
+    c.compute_average_fgratings_without_conditions(featured_data, mask, text)
 
 # Calculez pozitia medie pentru fiecare dinte cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
 # pentru fiecare cal
 
 for i in range(3):
     mask, text = r.return_mask_and_text_from_tracks(featured_data, i, 'Average Position')
-    featured_data[text] = c.compute_average_position(featured_data, mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'HorseId')
+    c.compute_average_positions_without_conditions(featured_data, mask, text)
 
 # Calculez FGrating mediu pentru cele trei tipuri de distante pentru fiecare cal
 for i in range(3):
     mask, text = r.return_mask_and_text_from_distance_types(featured_data, i, 'Average FGrating')
-    featured_data[text] = c.compute_average_fg_rating(featured_data, mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'HorseId')
+    c.compute_average_fgratings_without_conditions(featured_data, mask, text)
 
 # Calculez pozitia medie pentru cele trei tipuri de distante pentru fiecare cal
 for i in range(3):
     mask, text = r.return_mask_and_text_from_distance_types(featured_data, i, 'Average Position')
-    featured_data[text] = c.compute_average_position(featured_data, mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'HorseId')
+    c.compute_average_positions_without_conditions(featured_data, mask, text)
 
 # Calculez FGrating maxim pentru fiecare cal
-featured_data['Maximum FGrating'] = c.compute_max_fg_rating(featured_data)
-featured_data['Maximum FGrating'] = f.fill_for_all(featured_data, 'Maximum FGrating', 'HorseId')
+c.compute_max_fg_ratings_without_conditions(featured_data)
 
 # Calculez FGrating maxim pentru cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass, pentru fiecare cal
 for i in range(3):
     mask, text = r.return_mask_and_text_from_tracks(featured_data, i, 'Maximum FGrating')
-    featured_data[text] = c.compute_max_fg_rating(featured_data, mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'HorseId')
+    c.compute_max_fg_ratings_without_conditions(featured_data, mask, text)
 
 # Calculez FGrating maxim pentru cele trei tipuri de distante, pentru fiecare cal
 for i in range(3):
     mask, text = r.return_mask_and_text_from_distance_types(featured_data, i, 'Maximum FGrating')
-    featured_data[text] = c.compute_max_fg_rating(featured_data, mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'HorseId')
+    c.compute_max_fg_ratings_without_conditions(featured_data, mask, text)
 
 # Calculez FGrating maxim pentru fiecare cal din ultimele trei starturi
 featured_data['Maximum FGrating in last 3 starts'] = featured_data.groupby('HorseId')['FGrating'].apply(
@@ -108,20 +94,17 @@ featured_data['Days since last race'] = featured_data.groupby('HorseId')['Dato']
 for i in [1000, 90, 30]:
     text = 'Trainer winning % in the last ' + str(i) + ' days'
     time_length = str(i) + 'D'
-    featured_data[text] = c.compute_trainer_win_percent_in_last_days(featured_data, time_length)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'TrainerID')
+    c.compute_trainer_win_percent_without_conditions(featured_data, text, time_length=time_length)
 
 # Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile, pe cele trei tipuri de distante
 for i in range(3):
     mask, text = r.return_mask_and_text_from_distance_types(featured_data, i, 'Trainer winning % in the last 1000 days')
-    featured_data[text] = c.compute_trainer_win_percent_in_last_days(featured_data, '1000D', mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'TrainerID')
+    c.compute_trainer_win_percent_without_conditions(featured_data, text, mask=mask)
 
 # Calculez procentajul de victorii ale unui antrenor, in ultimele 1000 de zile, pe cele trei piste
 for i in range(3):
     mask, text = r.return_mask_and_text_from_tracks(featured_data, i, 'Trainer winning % in the last 1000 days')
-    featured_data[text] = c.compute_trainer_win_percent_in_last_days(featured_data, '1000D', mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'TrainerID')
+    c.compute_trainer_win_percent_without_conditions(featured_data, text, mask=mask)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile
 featured_data['Jockey winning % in the last 1000 days'] = c.compute_jockey_win_percent_in_last_days(featured_data,
@@ -246,11 +229,6 @@ featured_data['Horse winning %'] = featured_data.groupby('HorseId')['Horse winni
 featured_data = featured_data.drop(columns='cumsum')
 featured_data = featured_data.drop(columns='Win')
 featured_data = featured_data.sort_values(by=['Dato', 'Løpsnr', 'Plassering'])
-stop = datetime.datetime.now()
-print(stop - start)
 featured_data.to_excel('Date sortate.xlsx')
 featured_data = pd.DataFrame()
 del featured_data
-
-stop2 = datetime.datetime.now()
-print(stop2 - start)

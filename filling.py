@@ -1,24 +1,13 @@
-import returning as r
 import pandas as pd
+import returning as r
 
 
 def fill_preprocessing(df, what_for, text, column_to_fill, columns, horse_id):
     return df.loc[df.HorseId == horse_id][columns]
 
 
-def fill_na_s(df, column_name, what_for, column_to_fill):
-    if what_for == 'Tracks':
-        race_track, race_surface = r.return_track_and_surface_from_text(column_name)
-        work_columns = ['Track', 'Surface']
-        mask = (df.Track == race_track) & (df.Surface == race_surface)
-    elif what_for == 'Distances':
-        distance = r.return_distance_from_text(df, column_name)
-        work_columns = ['Distance']
-        mask = (df.Distance == distance)
-    else:
-        print('Eroare')
-        return None
-
+def fill_na_s(df, column_name, what_for, column_to_fill, work_columns, mask, race_track='', race_surface='',
+              distance=''):
     if len(df[work_columns].index) > 1:
         set_track_and_surface_data = df[work_columns].loc[mask]
         first_race_index = set_track_and_surface_data.index[0] if len(set_track_and_surface_data.index) > 0 else df[
@@ -26,8 +15,7 @@ def fill_na_s(df, column_name, what_for, column_to_fill):
     else:
         first_race_index = df[work_columns].index.min()
     value_to_replace = 0
-    for i in range(df[work_columns].index.min(), first_race_index + 1):
-        df.loc[i, column_name] = 0
+    df[column_name] = df[column_name].fillna(0, limit=first_race_index + 1 - df[work_columns].index.min())
     for i in range(first_race_index, df[work_columns].index.max() + 1):
         if pd.isnull(df.loc[i, column_name]):
             df.loc[i, column_name] = value_to_replace
@@ -42,9 +30,13 @@ def fill_for_all(df, column, group_by):
     return result
 
 
-def fill_the_gaps(df, what_for, text, column_to_fill):
+def fill_the_gaps(df, what_for, text, column_to_fill, work_columns, mask, race_track='', race_surface='', distance=''):
     columns = r.return_columns_that_will_be_used(what_for, column_to_fill, text)
+    df = df.loc[:, columns]
     for horse_id in df['HorseId'].unique():
         preprocessed_data = fill_preprocessing(df, what_for, text, column_to_fill, columns, horse_id)
-        df.loc[df.HorseId == horse_id, text] = fill_na_s(preprocessed_data, text, what_for, column_to_fill)
-        return df.loc[df.HorseId == horse_id, text]
+        df.loc[df.HorseId == horse_id, text] = fill_na_s(preprocessed_data, text, what_for, column_to_fill,
+                                                         work_columns, mask, race_track=race_track,
+                                                         race_surface=race_surface, distance=distance)
+    return df.loc[:, text]
+# TODO: functia aceasta e neobisnuit de inceata. Sa vad de ce.
