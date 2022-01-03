@@ -39,7 +39,7 @@ def compute_average_position(df, mask=''):
         df['cumsum'] = temp.shift(fill_value=0).cumsum()
         return df['cumsum'] / temp.cumcount()
     else:
-        return df.loc[mask].groupby('HorseId')['Plassering'].shift().expanding().mean()
+        return df.loc[mask].groupby('HorseId')['Plassering'].apply(lambda x: x.shift().expanding().mean())
 
 
 def compute_max_fg_rating(df, mask=''):

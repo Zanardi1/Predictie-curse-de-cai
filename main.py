@@ -46,7 +46,7 @@ for i in range(3):
     mask, text = r.return_mask_and_text_from_tracks(featured_data, i, 'Average FGrating')
     c.compute_average_fgratings_without_conditions(featured_data, mask, text)
 
-# Calculez pozitia medie pentru fiecare dinte cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
+# Calculez pozitia medie pentru fiecare dintre cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass
 # pentru fiecare cal
 
 for i in range(3):
