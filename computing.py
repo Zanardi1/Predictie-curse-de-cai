@@ -27,16 +27,16 @@ def compute_average_position_in_last_starts(df, no_starts):
 
 def compute_average_fg_rating(df, mask=''):
     if len(mask) == 0:
-        df['cumsum'] = df.groupby('HorseId')['FGrating'].shift(fill_value=0).cumsum()
+        df['cumsum'] = df.groupby('HorseId')['FGrating'].apply(lambda x: x.shift(fill_value=0).cumsum())
         return df['cumsum'] / df.groupby('HorseId')['FGrating'].cumcount()
     else:
-        return df.loc[mask].groupby('HorseId')['FGrating'].shift().expanding().mean()
+        return df.loc[mask].groupby('HorseId')['FGrating'].apply(lambda x: x.shift().expanding().mean())
 
 
 def compute_average_position(df, mask=''):
     if len(mask) == 0:
         temp = df.groupby('HorseId')['Plassering']
-        df['cumsum'] = temp.shift(fill_value=0).cumsum()
+        df['cumsum'] = temp.apply(lambda x: x.shift(fill_value=0).cumsum())
         return df['cumsum'] / temp.cumcount()
     else:
         return df.loc[mask].groupby('HorseId')['Plassering'].apply(lambda x: x.shift().expanding().mean())
