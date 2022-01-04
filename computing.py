@@ -18,11 +18,11 @@ def compute_last_final_position(df, mask=''):
 
 
 def compute_average_fgrating_in_last_starts(df, no_starts):
-    return df.groupby('HorseId')['FGrating'].apply(lambda x: x.shift().expanding(min_periods=no_starts).mean())
+    return df.groupby('HorseId')['FGrating'].transform(lambda x: x.shift(1).rolling(no_starts, 1).mean())
 
 
 def compute_average_position_in_last_starts(df, no_starts):
-    return df.groupby('HorseId')['Plassering'].apply(lambda x: x.shift().expanding(min_periods=no_starts).mean())
+    return df.groupby('HorseId')['Plassering'].transform(lambda x: x.shift(1).rolling(no_starts, 1).mean())
 
 
 def compute_average_fg_rating(df, mask=''):
