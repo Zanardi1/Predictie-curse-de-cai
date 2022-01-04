@@ -35,7 +35,7 @@ for i in [10, 4]:
 
 # Calculez pozitia finala medie in ultimele 10, respectiv 4 starturi pentru fiecare cal
 for i in [10, 4]:
-    text = 'Average Position in the last ' + str(i) + 'starts'
+    text = 'Average Position in the last ' + str(i) + ' starts'
     featured_data[text] = c.compute_average_position_in_last_starts(featured_data, i)
     featured_data[text] = f.fill_for_all(featured_data, text, 'HorseId')
 

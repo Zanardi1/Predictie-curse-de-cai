@@ -5,24 +5,24 @@ import returning as r
 
 def compute_last_fgrating(df, mask=''):
     if len(mask) == 0:
-        return df.groupby('HorseId')['FGrating'].shift(1)
+        return df.groupby('HorseId')['FGrating'].apply(lambda x: x.shift(1))
     else:
-        return df.loc[mask][['HorseId', 'FGrating']].groupby('HorseId')['FGrating'].shift(1)
+        return df.loc[mask][['HorseId', 'FGrating']].groupby('HorseId')['FGrating'].apply(lambda x: x.shift(1))
 
 
 def compute_last_final_position(df, mask=''):
     if len(mask) == 0:
-        return df.groupby('HorseId')['Plassering'].shift(1)
+        return df.groupby('HorseId')['Plassering'].apply(lambda x: x.shift(1))
     else:
-        return df.loc[mask][['HorseId', 'Plassering']].groupby('HorseId')['Plassering'].shift(1)
+        return df.loc[mask][['HorseId', 'Plassering']].groupby('HorseId')['Plassering'].apply(lambda x: x.shift(1))
 
 
 def compute_average_fgrating_in_last_starts(df, no_starts):
-    return df.groupby('HorseId')['FGrating'].shift().expanding(min_periods=no_starts).mean()
+    return df.groupby('HorseId')['FGrating'].apply(lambda x: x.shift().expanding(min_periods=no_starts).mean())
 
 
 def compute_average_position_in_last_starts(df, no_starts):
-    return df.groupby('HorseId')['Plassering'].shift().expanding(min_periods=no_starts).mean()
+    return df.groupby('HorseId')['Plassering'].apply(lambda x: x.shift().expanding(min_periods=no_starts).mean())
 
 
 def compute_average_fg_rating(df, mask=''):
