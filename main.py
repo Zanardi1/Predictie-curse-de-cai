@@ -87,8 +87,8 @@ featured_data['Top'] = (
     (featured_data['FGrating'] - featured_data['Maximum FGrating'] >= 4).map({True: 1, False: 0}))
 
 # Calculez numarul de zile de la ultima cursa pentru fiecare cal
-featured_data['Days since last race'] = featured_data.groupby('HorseId')['Dato'].diff().fillna(method='ffill').fillna(
-    pd.NaT)
+featured_data['Days since last race'] = featured_data.groupby('HorseId')['Dato'].apply(
+    lambda x: x.diff().fillna(method='ffill').fillna(pd.NaT))
 
 # Calculez procentajul de victorii ale unui antrenor in ultimele 1000, 90, respectiv 30 de zile
 for i in [1000, 90, 30]:
