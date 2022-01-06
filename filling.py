@@ -26,6 +26,7 @@ def fill_na_s(df, column_name, what_for, column_to_fill, work_columns, mask, rac
 
 
 def fill_for_all(df, column, group_by):
+    # result = df.groupby(group_by)[column].fillna(0, limit=df[column].first_valid_index()+1).fillna(method='bfill')
     result = df.groupby(group_by)[column].fillna(method='ffill').fillna(0)
     return result
 
