@@ -117,25 +117,25 @@ featured_data['Jockey winning % in the last 1000 days'] = featured_data.groupby(
 for i in range(5):
     mask, text = r.return_mask_and_text_from_tracks(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = c.compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
+    # featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare suprafata
 for i in [0, 1]:
     mask, text = r.return_mask_and_text_from_surfaces(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = c.compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
+    # featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare pista
 for i in range(3):
     mask, text = r.return_mask_and_text_from_tracks(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = c.compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
+    # featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare tip de distanta
 for i in range(3):
     mask, text = r.return_mask_and_text_from_distance_types(featured_data, i, 'Jockey winning % in the last 1000 days')
     featured_data[text] = c.compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
-    featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
+    # featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile, pe cele trei tipuri de distante
 # si pe cele doua tipuri de suprafete
@@ -144,7 +144,7 @@ for i in range(3):
         mask, text = r.return_mask_and_text_from_distances_and_surfaces(featured_data, i, j,
                                                                         'Jockey winning % in the last 1000 days')
         featured_data[text] = c.compute_jockey_win_percent_in_last_days(featured_data, '1000D', mask=mask)
-        featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
+        # featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
 
 # Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile
 featured_data[
@@ -186,7 +186,8 @@ for i in range(3):
                                                                                          mask=mask)
     featured_data[text] = f.fill_for_all(featured_data, text, 'JockeyId')
 
-# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele trei tipuri de distante si pe cele doua tipuri de suprafata
+# Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele trei tipuri de distante si pe cele doua
+# tipuri de suprafata
 for i in range(3):
     for j in range(2):
         mask, text = r.return_mask_and_text_from_distances_and_surfaces(featured_data, i, j,

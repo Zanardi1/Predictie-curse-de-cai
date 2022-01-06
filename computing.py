@@ -65,7 +65,7 @@ def compute_jockey_win_percent_in_last_days(df, no_days, mask=''):
         return (df.reset_index().groupby('JockeyId').rolling(no_days, on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
     else:
-        return (df.loc[mask].reset_index().groupby('JockeyId').rolling('1000D', on='Dato').agg(
+        return (df.loc[mask].reset_index().groupby('JockeyId').rolling(no_days, on='Dato').agg(
             {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
 
 
@@ -172,5 +172,5 @@ def compute_max_fg_ratings_without_conditions(df, mask='', text='Maximum FGratin
 
 
 def compute_trainer_win_percent_without_conditions(df, text, time_length='1000D', mask=''):
-    df[text] = compute_trainer_win_percent_in_last_days(df, time_length)
+    df[text] = compute_trainer_win_percent_in_last_days(df, time_length, mask=mask)
     f.fill_for_all(df, text, 'TrainerID')
