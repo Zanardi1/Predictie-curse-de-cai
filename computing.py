@@ -130,8 +130,6 @@ def compute_last_final_positions_on_tracks(df):
         df[text] = compute_last_final_position(df, mask=mask)
         df[text] = f.fill_the_gaps(df, 'Tracks', text, 'Plassering', work_columns, mask, race_track=race_track,
                                    race_surface=race_surface)
-    # TODO : sa mut functia fill_the_gaps in afara functiei compute_last_final_positions_on_tracks, deoarece
-    #  compute_last_final_positions_on_tracks ar executa doua lucruri.
 
 
 def compute_last_final_positions_on_distances(df):
@@ -142,8 +140,6 @@ def compute_last_final_positions_on_distances(df):
         text = 'Last Final Position at ' + str(distance) + ' m'
         df[text] = compute_last_final_position(df, mask=mask)
         df[text] = f.fill_the_gaps(df, 'Distances', text, 'Plassering', work_columns, mask, distance=distance)
-    # TODO : sa mut functia fill_the_gaps in afara functiei compute_last_final_positions_on_distances, deoarece
-    #  compute_last_final_positions_on_distances ar executa doua lucruri
 
 
 def compute_last_final_positions_with_conditions(df):

@@ -1,13 +1,9 @@
 import computing as c
-import filling as f
 import pandas as pd
-import returning as r
 
-raw_data = pd.read_excel('Data.xlsx')
-print(raw_data.shape)
-print(raw_data.head())
-
-featured_data = raw_data.copy()
+featured_data = pd.read_excel('Data.xlsx')
+print(featured_data.shape)
+print(featured_data.head())
 
 # Calculez Last FGrating pentru fiecare cal
 c.compute_last_fgratings_without_conditions(featured_data)
