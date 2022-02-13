@@ -1,11 +1,11 @@
-import sys
-
 import computing as c
 import pandas as pd
 
 featured_data = pd.read_excel('Data.xlsx')
 print(featured_data.shape)
 print(featured_data.head())
+featured_data = featured_data.sort_values(by=['Dato', 'Løpsnr', 'Plassering'])
+featured_data = featured_data.reset_index(drop=True)
 
 # Calculez Last FGrating pentru fiecare cal
 c.compute_last_fgratings_without_conditions(featured_data)
@@ -64,8 +64,6 @@ c.compute_top_for_horse(featured_data)
 c.compute_days_since_last_race(featured_data)
 
 # Calculez procentajul de victorii ale unui antrenor in ultimele 1000, 90, respectiv 30 de zile
-featured_data = featured_data.sort_values(by=['Dato'])
-featured_data = featured_data.reset_index(drop=True)
 c.compute_trainer_win_percent_in_the_last_days(featured_data)
 
 # Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile, pe cele trei tipuri de distante
@@ -75,8 +73,6 @@ c.compute_trainer_win_percent_for_every_distance(featured_data)
 c.compute_trainer_win_percent_for_every_track(featured_data)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile
-featured_data = featured_data.sort_values(by=['Dato'])
-featured_data = featured_data.reset_index(drop=True)
 c.compute_jockey_win_percent(featured_data)
 
 # Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe cele trei piste, precum si pe piste,
@@ -128,14 +124,10 @@ c.compute_jockey_mean_path_on_tracks_and_surfaces(featured_data)
 c.compute_jockey_mean_path_on_distances_and_surfaces(featured_data)
 
 # Calculez procentajul de victorii ale unui cal
-featured_data = featured_data.sort_values(by=['Dato'])
-featured_data = featured_data.reset_index(drop=True)
 c.compute_horse_win_percent(featured_data)
 
 featured_data = featured_data.drop(columns='cumsum')
-featured_data = featured_data.drop(columns='Win')
-featured_data = featured_data.sort_values(by=['Dato', 'Løpsnr', 'Plassering'])
-featured_data = featured_data.reset_index(drop=True)
+featured_data = featured_data.drop(columns='Index')
 featured_data.to_excel('Date sortate.xlsx')
 featured_data = pd.DataFrame()
 del featured_data

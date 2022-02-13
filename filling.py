@@ -16,7 +16,7 @@ def fill_na_s(df, column_name, what_for, column_to_fill, work_columns, mask, rac
         first_race_index = df[work_columns].index.min()
     value_to_replace = 0
     df[column_name] = df[column_name].fillna(0, limit=first_race_index + 1 - df[work_columns].index.min())
-    for i in range(first_race_index, df[work_columns].index.max() + 1):
+    for i in df[work_columns].index:
         if pd.isnull(df.loc[i, column_name]):
             df.loc[i, column_name] = value_to_replace
         else:

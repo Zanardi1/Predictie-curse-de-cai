@@ -50,63 +50,85 @@ def compute_max_fg_rating(df, mask=''):
 
 
 def compute_trainer_win_percent_in_last_days(df, no_days, mask=''):
+    df['Index'] = df.index
+    df = df.sort_values(['TrainerID', 'Dato'], kind='stable')
     if len(mask) == 0:
-        return (df.set_index('Dato').groupby('TrainerID').rolling(no_days)['Plassering'].apply(
-            lambda s: round((s.eq(1).sum() / len(s) * 100), 2)).groupby('TrainerID').shift().values)
+        df = df.assign(Position_for_calc=df.loc[:, 'Plassering'])
     else:
-        df['Index'] = df.index
-        df = df.sort_values(['TrainerID', 'Dato'], kind='stable')
         df = df.assign(Position_for_calc=df.loc[mask, 'Plassering'])
-        df = df.set_index('Dato')
-        calc = lambda s: round((100 * s.eq(1).sum() / s.notnull().sum()), 2)
-        ser_win = df.groupby('TrainerID').rolling(no_days)['Position_for_calc'].apply(calc).groupby(
-            'TrainerID').shift().fillna(0).values
-        df = df.assign(Win=ser_win).drop('Position_for_calc', axis=1)
-        df = df.set_index('Index')
-        df = df['Win']
-        return df
+    df = df.set_index('Dato')
+    calc = lambda s: round((100 * s.eq(1).sum() / s.notnull().sum()), 2)
+    ser_win = df.groupby('TrainerID').rolling(no_days)['Position_for_calc'].apply(calc).groupby(
+        'TrainerID').shift().fillna(0).values
+    df = df.assign(Win=ser_win).drop('Position_for_calc', axis=1)
+    df = df.set_index('Index')
+    df = df['Win']
+    return df
 
 
 def compute_jockey_win_percent_in_last_days(df, no_days, mask=''):
-    df['Win'] = df['Plassering'].eq(1)
+    df['Index'] = df.index
+    df = df.sort_values(['JockeyId', 'Dato'], kind='stable')
     if len(mask) == 0:
-        return (df.set_index('Dato').groupby('JockeyId').rolling(no_days)['Plassering'].apply(
-            lambda s: round(s.eq(1).sum() / len(s) * 100)).groupby('JockeyId').shift().values)
-        # return (df.reset_index().groupby('JockeyId').rolling(no_days, on='Dato').agg(
-        #     {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+        df = df.assign(Position_for_calc=df.loc[:, 'Plassering'])
     else:
-        return (df.loc[mask].reset_index().groupby('JockeyId').rolling(no_days, on='Dato').agg(
-            {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+        df = df.assign(Position_for_calc=df.loc[mask, 'Plassering'])
+    df = df.set_index('Dato')
+    calc = lambda s: round((100 * s.eq(1).sum() / s.notnull().sum()), 2)
+    ser_win = df.groupby('JockeyId').rolling(no_days)['Position_for_calc'].apply(calc).groupby(
+        'JockeyId').shift().fillna(0).values
+    df = df.assign(Win=ser_win).drop('Position_for_calc', axis=1)
+    df = df.set_index('Index')
+    df = df['Win']
+    return df
 
 
 def compute_jockey_average_final_position_in_last_days(df, no_days, mask=''):
+    df['Index'] = df.index
+    df = df.sort_values(['JockeyId', 'Dato'], kind='stable')
     if len(mask) == 0:
-        return (df.set_index('Dato').groupby('JockeyId').rolling(no_days)['Plassering'].apply(
-            lambda s: round(s.eq(1).sum() / len(s) * 100)).groupby('JockeyId').shift().values)
-        # return (df.set_index('Dato').groupby(['JockeyId', pd.Grouper(freq=no_days)])['Plassering'].transform(
-        #     lambda x: x.expanding().mean()).to_numpy())
+        df = df.assign(Position_for_calc=df.loc[:, 'Plassering'])
     else:
-        return (df[mask].set_index('Dato').groupby(['JockeyId', 'Track', pd.Grouper(freq=no_days)])[
-                    'Plassering'].transform(lambda x: x.expanding().mean()).to_numpy())
+        df = df.assign(Position_for_calc=df.loc[mask, 'Plassering'])
+    df = df.set_index('Dato')
+    calc = lambda s: round(s.mean(), 2)
+    ser_win = df.groupby('JockeyId').rolling(no_days)['Position_for_calc'].apply(calc).groupby(
+        'JockeyId').shift().fillna(0).values
+    df = df.assign(Win=ser_win).drop('Position_for_calc', axis=1)
+    df = df.set_index('Index')
+    df = df['Win']
+    return df
 
 
 def compute_jockey_mean_path_in_last_days(df, no_days, mask=''):
+    df['Index'] = df.index
+    df = df.sort_values(['JockeyId', 'Dato'], kind='stable')
     if len(mask) == 0:
-        return (df.set_index('Dato').groupby('JockeyId').rolling(no_days)['Path'].apply(
-            lambda s: round(s.eq(1).sum() / len(s) * 100)).groupby('JockeyId').shift().values)
-        # return df.set_index('Dato').groupby(['JockeyId', pd.Grouper(freq='1000D')])['Path'].transform(
-        #     lambda x: x.expanding().mean()).to_numpy()
+        df = df.assign(Position_for_calc=df.loc[:, 'Path'])
     else:
-        return df[mask].set_index('Dato').groupby(['JockeyId', 'Surface', pd.Grouper(freq='1000D')])[
-            'Path'].transform(lambda x: x.expanding().mean()).to_numpy()
+        df = df.assign(Position_for_calc=df.loc[mask, 'Path'])
+    df = df.set_index('Dato')
+    calc = lambda s: round(s.mean(), 2)
+    ser_win = df.groupby('JockeyId').rolling(no_days)['Position_for_calc'].apply(calc).groupby(
+        'JockeyId').shift().fillna(0).values
+    df = df.assign(Win=ser_win).drop('Position_for_calc', axis=1)
+    df = df.set_index('Index')
+    df = df['Win']
+    return df
 
 
 def compute_horse_win_percentage(df):
-    df['Win'] = df['Plassering'].eq(1)
-    return (df.set_index('Dato').groupby('HorseId').rolling('1000D')['Plassering'].apply(
-        lambda s: round(s.eq(1).sum() / len(s) * 100)).groupby('HorseId').shift().values)
-    # return (df.reset_index().groupby('HorseId').rolling('1000D', on='Dato').agg(
-    #     {'Win': 'mean', 'index': 'max'}).reset_index(drop=True).set_index('index').mul(100).round(2))
+    df['Index'] = df.index
+    df = df.sort_values(['HorseId', 'Dato'], kind='stable')
+    df = df.assign(Position_for_calc=df.loc[:, 'Plassering'])
+    df = df.set_index('Dato')
+    calc = lambda s: round((100 * s.eq(1).sum() / s.notnull().sum()), 2)
+    ser_win = df.groupby('HorseId').rolling('1000D')['Position_for_calc'].apply(calc).groupby('HorseId').shift().fillna(
+        0).values
+    df = df.assign(Win=ser_win).drop('Position_for_calc', axis=1)
+    df = df.set_index('Index')
+    df = df['Win']
+    return df
 
 
 def compute_last_fgratings_on_tracks(df):
