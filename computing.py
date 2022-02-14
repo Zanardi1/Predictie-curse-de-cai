@@ -207,7 +207,6 @@ def compute_max_fg_ratings_without_conditions(df, mask='', text='Maximum FGratin
 
 def compute_trainer_win_percent_without_conditions(df, text, time_length='1000D', mask=''):
     df[text] = compute_trainer_win_percent_in_last_days(df, time_length, mask=mask)
-    f.fill_for_all(df, text, 'TrainerID')
 
 
 def compute_average_fgratings_in_the_last_10_or_4_starts(df):
