@@ -132,22 +132,17 @@ def compute_horse_win_percentage(df):
 
 
 def compute_last_fgratings_on_tracks(df):
-    race_track, race_surface, distance, work_columns, mask = r.return_filling_parameters(
-        df, 'Tracks')
     for i in range(3):
         mask, text = r.return_mask_and_text_from_tracks(df, i, 'Last FGrating')
         df[text] = compute_last_fgrating(df, mask=mask)
-        df[text] = f.fill_the_gaps(df, 'Tracks', text, 'FGrating', work_columns, mask, race_track=race_track,
-                                   race_surface=race_surface)
+        df[text] = f.fill_the_gaps(df, 'Tracks', text, 'FGrating')
 
 
 def compute_last_fgratings_on_distances(df):
-    race_track, race_surface, distance, work_columns, mask = r.return_filling_parameters(
-        df, 'Distances')
     for distance in df['Distance'].unique():
         mask, text = r.return_mask_and_text_from_distances(df, distance, 'Last FGrating')
         df[text] = compute_last_fgrating(df, mask=mask)
-        df[text] = f.fill_the_gaps(df, 'Distances', text, 'FGrating', work_columns, mask, distance=distance)
+        df[text] = f.fill_the_gaps(df, 'Distances', text, 'FGrating')
 
 
 def compute_last_fgratings_with_conditions(df):
@@ -161,23 +156,18 @@ def compute_last_fgratings_without_conditions(df):
 
 
 def compute_last_final_positions_on_tracks(df):
-    race_track, race_surface, distance, work_columns, mask = r.return_filling_parameters(
-        df, 'Tracks')
     for i in range(3):
         mask, text = r.return_mask_and_text_from_tracks(df, i, 'Last Final Position at')
         df[text] = compute_last_final_position(df, mask=mask)
-        df[text] = f.fill_the_gaps(df, 'Tracks', text, 'Plassering', work_columns, mask, race_track=race_track,
-                                   race_surface=race_surface)
+        df[text] = f.fill_the_gaps(df, 'Tracks', text, 'Plassering')
 
 
 def compute_last_final_positions_on_distances(df):
-    race_track, race_surface, distance, work_columns, mask = r.return_filling_parameters(
-        df, 'Distances')
     for distance in df['Distance'].unique():
         mask = df.Distance == distance
         text = 'Last Final Position at ' + str(distance) + ' m'
         df[text] = compute_last_final_position(df, mask=mask)
-        df[text] = f.fill_the_gaps(df, 'Distances', text, 'Plassering', work_columns, mask, distance=distance)
+        df[text] = f.fill_the_gaps(df, 'Distances', text, 'Plassering')
 
 
 def compute_last_final_positions_with_conditions(df):

@@ -102,18 +102,3 @@ def return_distance_from_text(df, text):
     for distance in df['Distance'].unique():
         if str(distance) in text:
             return distance
-
-
-def return_filling_parameters(df, what_for):
-    if what_for == 'Tracks':
-        race_track, race_surface = return_track_and_surface_from_text(what_for)
-        work_columns = ['Track', 'Surface']
-        mask = (df.Track == race_track) & (df.Surface == race_surface)
-        distance = ''
-    if what_for == 'Distances':
-        distance = return_distance_from_text(df, what_for)
-        race_track = ''
-        race_surface = ''
-        work_columns = ['Distance']
-        mask = (df.Distance == distance)
-    return race_track, race_surface, distance, work_columns, mask
