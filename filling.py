@@ -28,4 +28,4 @@ def fill_the_gaps(df, what_for, text, column_to_fill):
         preprocessed_data = fill_preprocessing(df, columns, horse_id)
         df.loc[df.HorseId == horse_id, text] = fill_na_s(preprocessed_data, text, column_to_fill)
     return df.loc[:, text]
-# TODO: functia aceasta e neobisnuit de inceata. Sa vad de ce.
+# TODO: functia aceasta e neobisnuit de inceata. Sa vad de ce (profiling)
