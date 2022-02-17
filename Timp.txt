@@ -1,0 +1,41 @@
+Calculez Last FGrating pentru fiecare cal. Ora:  2022-02-17 10:46:16.981965
+Calculez Last Final Position pentru fiecare cal. Ora:  2022-02-17 10:46:17.690071
+Calculez Last FGrating pentru cele trei piste, respectiv pentru fiecare distanta, ambele pentru fiecare cal. Ora:  2022-02-17 10:46:18.346314
+Calculez pozitia finala pentru cele trei piste, respectiv pentru fiecare distanta, ambele pentru fiecare cal. Ora:  2022-02-17 10:47:38.716305
+Calculez FGrating mediu total al fiecarui cal. Ora:  2022-02-17 10:48:50.721916
+Calculez pozitia medie totala pe fiecare cal. Ora:  2022-02-17 10:48:51.414061
+Calculez FGrating mediu in ultimele 10, respectiv 4 starturi pentru fiecare cal. Ora:  2022-02-17 10:48:52.129109
+Calculez pozitia finala medie in ultimele 10, respectiv 4 starturi pentru fiecare cal. Ora:  2022-02-17 10:48:54.374103
+Calculez FGrating mediu pentru fiecare dintre cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass pentru fiecare cal. Ora:  2022-02-17 10:48:56.593258
+Calculez pozitia medie pentru fiecare dintre cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass pentru fiecare cal. Ora:  2022-02-17 10:48:58.741466
+Calculez FGrating mediu pentru cele trei tipuri de distante pentru fiecare cal. Ora:  2022-02-17 10:49:00.921724
+Calculez pozitia medie pentru cele trei tipuri de distante pentru fiecare cal. Ora:  2022-02-17 10:49:02.826590
+Calculez FGrating maxim pentru fiecare cal. Ora:  2022-02-17 10:49:04.709593
+Calculez FGrating maxim pentru cele trei piste:Sha Tin Grass, Sha Tin Dirt si Happy Valley Grass, pentru fiecare cal. Ora:  2022-02-17 10:49:05.529360
+Calculez FGrating maxim pentru cele trei tipuri de distante, pentru fiecare cal. Ora:  2022-02-17 10:49:07.587852
+Calculez FGrating maxim pentru fiecare cal din ultimele trei starturi. Ora:  2022-02-17 10:49:09.461877
+Calculez daca un cal a fost varf de forma intr-o anumita cursa. Ora:  2022-02-17 10:49:10.303625
+Calculez numarul de zile de la ultima cursa pentru fiecare cal. Ora:  2022-02-17 10:49:10.307625
+Calculez procentajul de victorii ale unui antrenor in ultimele 1000, 90, respectiv 30 de zile. Ora:  2022-02-17 10:49:11.314879
+Calculez procentajul de victorii ale unui antrenor in ultimele 1000 de zile, pe cele trei tipuri de distante. Ora:  2022-02-17 10:49:45.102584
+Calculez procentajul de victorii ale unui antrenor, in ultimele 1000 de zile, pe cele trei piste. Ora:  2022-02-17 10:50:18.604122
+Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile. Ora:  2022-02-17 10:50:52.648195
+Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe cele trei piste, precum si pe piste, dar indiferent de suprafata. Ora:  2022-02-17 10:51:04.182379
+Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare suprafata. Ora:  2022-02-17 10:52:02.603143
+Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare pista. Ora:  2022-02-17 10:52:28.323335
+Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile pe fiecare tip de distanta. Ora:  2022-02-17 10:53:01.285153
+Calculez procentajul de victorii al unui jocheu in ultimele 1000 de zile, pe cele trei tipuri de distante si pe cele doua tipuri de suprafete. Ora:  2022-02-17 10:53:32.888607
+Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile. Ora:  2022-02-17 10:54:25.962620
+Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele doua piste, indiferent de suprafata. Ora:  2022-02-17 10:54:30.260123
+Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele doua suprafete. Ora:  2022-02-17 10:54:39.636041
+Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele 2 piste, inclusiv suprafetele. Ora:  2022-02-17 10:54:48.853383
+Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele trei tipuri de distante. Ora:  2022-02-17 10:55:11.741149
+Calculez pozitia finala medie a unui jocheu in ultimele 1000 de zile pe cele trei tipuri de distante si pe cele doua tipuri de suprafata. Ora:  2022-02-17 10:55:25.741695
+Calculez pozitia medie de plecare (Path) a unui jocheu in ultimele 1000 de zile. Ora:  2022-02-17 10:55:48.527737
+Calculez pozitia medie de plecare (Path) a unui jocheu in ultimele 1000 de zile, in functie de suprafata. Ora:  2022-02-17 10:55:52.873110
+Calculez pozitia medie de plecare (Path) a unui jocheu in ultimele 1000 de zile, in functie de pista si suprafata. Ora:  2022-02-17 10:56:02.050598
+Calculez pozitia medie de plecare (Path) a unui jocheu in ultimele 1000 de zile, in functie de suprafata si distanta. Ora:  2022-02-17 10:56:15.989309
+Calculez procentajul de victorii ale unui cal. Ora:  2022-02-17 10:56:39.017661
+Generez fisierul cu rezultate. Ora:  2022-02-17 10:56:50.007263
+Final. Ora:  2022-02-17 10:59:10.495092
+Durata totala:  0:12:53.513127

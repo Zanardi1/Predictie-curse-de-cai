@@ -1,6 +1,7 @@
+import datetime as dt
+
 import computing as c
 import pandas as pd
-import datetime as dt
 
 featured_data = pd.read_excel('Data.xlsx')
 print(featured_data.shape)
@@ -31,10 +32,12 @@ c.compute_average_fgratings_without_conditions(featured_data)
 print('Calculez pozitia medie totala pe fiecare cal. Ora: ', dt.datetime.now())
 c.compute_average_positions_without_conditions(featured_data)
 
-print('Calculez FGrating mediu in ultimele 10, respectiv 4 starturi pentru fiecare cal. Ora: ', dt.datetime.now())
+print('Calculez FGrating mediu in ultimele 10, respectiv 4 starturi pentru fiecare cal. Ora: ', dt.datetime.now(),
+      )
 c.compute_average_fgratings_in_the_last_10_or_4_starts(featured_data)
 
-print('Calculez pozitia finala medie in ultimele 10, respectiv 4 starturi pentru fiecare cal. Ora: ', dt.datetime.now())
+print('Calculez pozitia finala medie in ultimele 10, respectiv 4 starturi pentru fiecare cal. Ora: ',
+      dt.datetime.now())
 c.compute_average_final_position_in_the_last_10_or_4_starts(featured_data)
 
 print(
@@ -47,7 +50,8 @@ print(
     dt.datetime.now())
 c.compute_average_final_position_for_every_track(featured_data)
 
-print('Calculez FGrating mediu pentru cele trei tipuri de distante pentru fiecare cal. Ora: ', dt.datetime.now())
+print('Calculez FGrating mediu pentru cele trei tipuri de distante pentru fiecare cal. Ora: ', dt.datetime.now(),
+      )
 c.compute_average_fgratings_for_every_distance_type(featured_data)
 
 print('Calculez pozitia medie pentru cele trei tipuri de distante pentru fiecare cal. Ora: ', dt.datetime.now())
