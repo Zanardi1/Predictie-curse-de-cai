@@ -82,23 +82,3 @@ def return_mask_and_text_from_distances_and_surfaces(df, distance, surface_type,
                     df.Surface == 'Dirt')
             text = str(metric) + ' at long distance on dirt'
     return mask, text
-
-
-def return_track_from_text(text):
-    return 'Sha Tin' if 'Sha Tin' in text else 'Happy Valley'
-
-
-def return_surface_from_text(text):
-    return 'Gress' if 'Grass' in text else 'Dirt'
-
-
-def return_track_and_surface_from_text(text):
-    track = return_track_from_text(text)
-    surface = return_surface_from_text(text)
-    return track, surface
-
-
-def return_distance_from_text(df, text):
-    for distance in df['Distance'].unique():
-        if str(distance) in text:
-            return distance
