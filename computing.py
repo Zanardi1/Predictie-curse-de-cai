@@ -261,7 +261,7 @@ def compute_top_for_horse(df):
 
 def compute_days_since_last_race(df):
     df['Days since last race'] = df.groupby('HorseId')['Dato'].apply(
-        lambda x: x.diff().fillna(method='ffill').fillna(pd.NaT))
+        lambda x: x.diff().fillna(method='ffill').fillna(pd.Timedelta(seconds=0)))
 
 
 def compute_trainer_win_percent_in_the_last_days(df):
